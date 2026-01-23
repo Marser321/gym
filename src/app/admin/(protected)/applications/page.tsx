@@ -11,12 +11,13 @@ export default function ApplicationsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const supabase = createClient();
 
-    useEffect(() => {
-        fetchApplications();
-    }, []);
+    const [isDemoMode, setIsDemoMode] = useState(false);
+
+    useEffect(() => { fetchApplications(); }, []);
 
     const fetchApplications = async () => {
         setIsLoading(true);
+        setIsDemoMode(false);
         try {
             const { data, error } = await supabase
                 .from("membership_requests")
@@ -24,15 +25,20 @@ export default function ApplicationsPage() {
                 .eq("status", "pending")
                 .order("created_at", { ascending: false });
 
-            if (error) throw error;
+            if (error) {
+                if (error.code === 'PGRST116' || error.message.includes('relation "membership_requests" does not exist')) {
+                    setIsDemoMode(true);
+                }
+                throw error;
+            }
             setApplications(data || []);
         } catch (err) {
-            console.error("Error fetching applications:", err);
-            // Fallback mock para demo
+            console.error("Fetch Applications Error:", err);
+            setIsDemoMode(true);
             setApplications([
                 {
                     id: "demo-1",
-                    full_name: "Ignacio Techera",
+                    full_name: "Ignacio Techera (Demo)",
                     email: "ignacio@tech.com",
                     phone: "099 123 456",
                     goal: "Hipertrofia",
@@ -71,9 +77,16 @@ export default function ApplicationsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold text-white uppercase tracking-tight">Solicitudes de Membresía</h1>
-                <p className="text-gray-400 text-sm">Nuevos prospectos que quieren unirse al GYM Premium.</p>
+            <div className="flex justify-between items-start">
+                <div>
+                    <h1 className="text-2xl font-bold text-white uppercase tracking-tight">Solicitudes de Membresía</h1>
+                    <p className="text-gray-400 text-sm">Nuevos prospectos que quieren unirse al GYM Premium.</p>
+                </div>
+                {isDemoMode && (
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-2 text-[10px] text-yellow-500 font-bold uppercase tracking-widest animate-pulse max-w-xs text-right">
+                        ⚠️ Modo Demo: Crea la tabla "membership_requests" en Supabase para ver datos reales.
+                    </div>
+                )}
             </div>
 
             <div className="grid gap-4">

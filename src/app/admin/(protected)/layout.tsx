@@ -35,6 +35,18 @@ export default async function AdminLayout({
         redirect("/admin/login");
     }
 
+    // Fetch pending applications count
+    let pendingCount = 0;
+    try {
+        const { count } = await supabase
+            .from('membership_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'pending');
+        pendingCount = count || 0;
+    } catch (e) {
+        // Silently fail, just show 0 or no badge
+    }
+
 
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
@@ -56,16 +68,26 @@ export default async function AdminLayout({
                 </div>
 
                 <nav className="flex-1 space-y-1 p-4">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className="flex items-center gap-3 rounded-xl px-4 py-3 text-gray-400 hover:bg-white/5 hover:text-white transition-all"
-                        >
-                            <item.icon className="h-5 w-5" />
-                            <span className="font-medium">{item.label}</span>
-                        </Link>
-                    ))}
+                    {menuItems.map((item) => {
+                        const showBadge = item.label === "Solicitudes" && pendingCount > 0;
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className="flex items-center justify-between rounded-xl px-4 py-3 text-gray-400 hover:bg-white/5 hover:text-white transition-all group"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <item.icon className="h-5 w-5" />
+                                    <span className="font-medium">{item.label}</span>
+                                </div>
+                                {showBadge && (
+                                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-neon-cyan text-[10px] font-bold text-black shadow-[0_0_10px_rgba(0,243,255,0.5)]">
+                                        {pendingCount}
+                                    </span>
+                                )}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
                 <div className="border-t border-white/5 p-4">

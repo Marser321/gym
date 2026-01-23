@@ -1,13 +1,56 @@
+"use client";
+
 import { CrystalCard } from "@/components/crystal/CrystalCard";
-import { DollarSign, Users, UserPlus, TrendingUp } from "lucide-react";
+import { DollarSign, Users, UserPlus, TrendingUp, Loader2 } from "lucide-react";
 import { CrystalAreaChart } from "@/components/admin/CrystalAreaChart";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 export default function AdminDashboardPage() {
+    const [stats, setStats] = useState({
+        revenue: "$42,500",
+        activeMembers: "342",
+        pendingApplications: "0",
+        checkins: "115"
+    });
+    const [isLoading, setIsLoading] = useState(true);
+    const supabase = createClient();
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                // Count pending applications
+                const { count, error } = await supabase
+                    .from('membership_requests')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'pending');
+
+                if (!error && count !== null) {
+                    setStats(prev => ({ ...prev, pendingApplications: count.toString() }));
+                }
+            } catch (e) {
+                console.error("Error fetching admin stats:", e);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
     const kpis = [
-        { label: "Ingresos Mensuales", value: "$42,500", trend: "+12%", icon: DollarSign, color: "neon-cyan" },
-        { label: "Socios Activos", value: "342", trend: "+5%", icon: Users, color: "purple-500" },
-        { label: "Nuevos (Este mes)", value: "28", trend: "-2%", icon: UserPlus, color: "green-400" },
-        { label: "Check-ins Hoy", value: "115", trend: "+18%", icon: TrendingUp, color: "orange-400" },
+        { label: "Ingresos Mensuales", value: stats.revenue, trend: "+12%", icon: DollarSign, color: "neon-cyan" },
+        { label: "Socios Activos", value: stats.activeMembers, trend: "+5%", icon: Users, color: "purple-500" },
+        {
+            label: "Solicitudes Pendientes",
+            value: stats.pendingApplications,
+            trend: "Ver todas",
+            href: "/admin/applications",
+            icon: UserPlus,
+            color: stats.pendingApplications !== "0" ? "orange-400" : "green-400"
+        },
+        { label: "Check-ins Hoy", value: stats.checkins, trend: "+18%", icon: TrendingUp, color: "neon-cyan" },
     ];
 
     const colorMap: Record<string, string> = {
@@ -23,32 +66,39 @@ export default function AdminDashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {kpis.map((kpi, idx) => {
                     const Icon = kpi.icon;
-                    return (
-                        <CrystalCard key={idx} className="p-6" hoverEffect>
+                    const Content = (
+                        <CrystalCard key={idx} className="p-6 h-full" hoverEffect>
                             <div className="flex items-center justify-between mb-4">
                                 <div className={`p-3 rounded-xl border ${colorMap[kpi.color]}`}>
                                     <Icon className="h-6 w-6" />
                                 </div>
-                                <span className={`text-xs font-bold px-2 py-1 rounded-full ${kpi.trend.startsWith('+') ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                                <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-widest ${kpi.trend.startsWith('+') ? 'bg-green-500/10 text-green-400' : 'bg-neon-cyan/10 text-neon-cyan'}`}>
                                     {kpi.trend}
                                 </span>
                             </div>
                             <div className="space-y-1">
-                                <h3 className="text-gray-400 text-sm">{kpi.label}</h3>
-                                <p className="text-2xl font-bold text-white">{kpi.value}</p>
+                                <h3 className="text-gray-400 text-xs uppercase tracking-wider font-bold">{kpi.label}</h3>
+                                <p className="text-3xl font-black text-white italic">{kpi.value}</p>
                             </div>
                         </CrystalCard>
                     );
+
+                    return kpi.href ? (
+                        <Link key={idx} href={kpi.href}>{Content}</Link>
+                    ) : Content;
                 })}
             </div>
 
             {/* Main Charts Area */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <CrystalCard className="lg:col-span-2 p-6 min-h-[400px]">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-bold text-white">Evolución de Ingresos</h3>
-                        <div className="flex gap-2">
-                            <span className="text-xs font-bold text-neon-cyan bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/20">Año Actual</span>
+                <CrystalCard className="lg:col-span-2 p-8 min-h-[400px]">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-xl font-bold text-white uppercase tracking-tight">Evolución Comercial</h3>
+                            <p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Ingresos netos vs Inscripciones</p>
+                        </div>
+                        <div className="flex gap-2 font-mono text-[10px]">
+                            <span className="text-neon-cyan border border-neon-cyan/30 px-2 py-1 rounded bg-neon-cyan/5">Q1 2026</span>
                         </div>
                     </div>
                     <div className="h-[300px] w-full flex items-end">
@@ -67,15 +117,35 @@ export default function AdminDashboardPage() {
                     </div>
                 </CrystalCard>
 
-                <CrystalCard className="p-6">
-                    <h3 className="text-xl font-bold text-white mb-6">Membresías</h3>
+                <CrystalCard className="p-8">
+                    <h3 className="text-xl font-bold text-white mb-6 uppercase tracking-tight italic">Top Planes</h3>
                     <div className="space-y-4">
-                        {['Premium Anual', 'Mensual Básico', 'Pase Diario'].map((plan, i) => (
-                            <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                                <span className="text-gray-300">{plan}</span>
-                                <span className="font-mono text-neon-cyan">{(30 - i * 5)}%</span>
+                        {[
+                            { name: 'Elite Anual', pct: 45, color: 'neon-cyan' },
+                            { name: 'Mensual Full', pct: 30, color: 'purple-500' },
+                            { name: 'Pase 10', pct: 15, color: 'green-400' },
+                            { name: 'Otros', pct: 10, color: 'gray-500' }
+                        ].map((plan, i) => (
+                            <div key={i} className="space-y-2">
+                                <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-400">
+                                    <span>{plan.name}</span>
+                                    <span className="text-white">{plan.pct}%</span>
+                                </div>
+                                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full bg-${plan.color.split('-')[0]}-500`}
+                                        style={{ width: `${plan.pct}%` }}
+                                    />
+                                </div>
                             </div>
                         ))}
+                    </div>
+
+                    <div className="mt-12 p-4 rounded-2xl bg-neon-cyan/5 border border-neon-cyan/10">
+                        <p className="text-[10px] text-neon-cyan uppercase font-bold tracking-widest mb-1 italic">Tip del Coach AI:</p>
+                        <p className="text-xs text-gray-400 leading-relaxed">
+                            La retención en planes "Elite Anual" subió un 12%. Recomendado: Lanzar promo de referidos.
+                        </p>
                     </div>
                 </CrystalCard>
             </div>
