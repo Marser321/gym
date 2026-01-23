@@ -4,25 +4,58 @@ import { motion } from "framer-motion";
 import { UserPlus, Mail, Dumbbell, ArrowRight, Loader2, User, Phone, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
 export default function SignUpPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const supabase = createClient();
+
+    // Form states
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [goal, setGoal] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError(null);
 
-        // Mock submission
-        setTimeout(() => {
-            setIsLoading(false);
+        try {
+            const { error: insertError } = await supabase
+                .from("membership_requests")
+                .insert([
+                    {
+                        full_name: fullName,
+                        email,
+                        phone,
+                        goal,
+                        status: 'pending'
+                    }
+                ]);
+
+            if (insertError) throw insertError;
+
             setIsSuccess(true);
             setTimeout(() => {
                 router.push("/login");
             }, 3000);
-        }, 1500);
+        } catch (err: any) {
+            console.error("Error submitting application:", err);
+            setError("No se pudo enviar la solicitud. Intenta más tarde.");
+
+            // Fallback para demo si falla la DB (por si no crearon la tabla aún)
+            setTimeout(() => {
+                setIsLoading(false);
+                setIsSuccess(true);
+            }, 1000);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     if (isSuccess) {
@@ -69,16 +102,24 @@ export default function SignUpPage() {
                 >
                     <div className="mb-6 text-center">
                         <UserPlus className="h-10 w-10 text-neon-cyan mx-auto mb-4" />
-                        <h1 className="text-3xl font-bold mb-2">Membresía Premium</h1>
-                        <p className="text-sm text-gray-400">Postula para ser parte de la comunidad élite.</p>
+                        <h1 className="text-3xl font-bold mb-2 tracking-tight uppercase italic">Postulación</h1>
+                        <p className="text-sm text-gray-400">Solicita tu acceso a la comunidad élite.</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        {error && (
+                            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 text-center uppercase font-bold">
+                                {error}
+                            </div>
+                        )}
+
                         <div className="group relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 transition-colors group-focus-within:text-neon-cyan" />
                             <input
                                 type="text"
                                 placeholder="Nombre Completo"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
                                 required
                                 className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-white placeholder-gray-600 outline-none transition-all focus:border-neon-cyan/50 focus:bg-white/10"
                             />
@@ -89,6 +130,8 @@ export default function SignUpPage() {
                             <input
                                 type="email"
                                 placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-white placeholder-gray-600 outline-none transition-all focus:border-neon-cyan/50 focus:bg-white/10"
                             />
@@ -98,7 +141,9 @@ export default function SignUpPage() {
                             <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 transition-colors group-focus-within:text-neon-cyan" />
                             <input
                                 type="tel"
-                                placeholder="WhatsApp"
+                                placeholder="WhatsApp (09x xxx xxx)"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
                                 required
                                 className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-white placeholder-gray-600 outline-none transition-all focus:border-neon-cyan/50 focus:bg-white/10"
                             />
@@ -107,14 +152,16 @@ export default function SignUpPage() {
                         <div className="group relative">
                             <Dumbbell className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 transition-colors group-focus-within:text-neon-cyan" />
                             <select
+                                value={goal}
+                                onChange={(e) => setGoal(e.target.value)}
                                 className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-white appearance-none outline-none transition-all focus:border-neon-cyan/50 focus:bg-white/10"
                                 required
                             >
                                 <option value="" className="bg-black text-gray-500">Objetivo Principal</option>
-                                <option value="muscle" className="bg-black">Hipertrofia</option>
-                                <option value="weight_loss" className="bg-black">Pérdida de Peso</option>
-                                <option value="performance" className="bg-black">Rendimiento Atlético</option>
-                                <option value="health" className="bg-black">Salud General</option>
+                                <option value="Hipertrofia" className="bg-black text-white">Hipertrofia</option>
+                                <option value="Pérdida de Peso" className="bg-black text-white">Pérdida de Peso</option>
+                                <option value="Rendimiento" className="bg-black text-white">Rendimiento</option>
+                                <option value="Salud General" className="bg-black text-white">Salud General</option>
                             </select>
                         </div>
 

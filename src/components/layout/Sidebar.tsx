@@ -61,16 +61,6 @@ export function Sidebar() {
                         </Link>
                     );
                 })}
-
-                <div className="pt-4 mt-4 border-t border-white/5">
-                    <Link
-                        href="/dashboard/qr"
-                        className="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all"
-                    >
-                        <QrCode className="h-5 w-5" />
-                        Acceso QR
-                    </Link>
-                </div>
             </nav>
 
             <div className="border-t border-white/5 p-4">
@@ -82,6 +72,6 @@ export function Sidebar() {
                     Cerrar Sesión
                 </button>
             </div>
-        </aside>
+        </aside >
     );
 }

@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { LayoutDashboard, Users, CreditCard, Dumbbell, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, CreditCard, Dumbbell, Settings, LogOut, UserPlus } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminLayout({
@@ -39,6 +39,7 @@ export default async function AdminLayout({
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
         { icon: Users, label: "Socios", href: "/admin/members" },
+        { icon: UserPlus, label: "Solicitudes", href: "/admin/applications" },
         { icon: CreditCard, label: "Pagos", href: "/admin/finance" },
         { icon: Dumbbell, label: "Servicios", href: "/admin/services" },
         { icon: Settings, label: "Configuración", href: "/admin/settings" },
