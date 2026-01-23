@@ -13,6 +13,7 @@ const navItems = [
     { href: "/dashboard/routines", label: "Rutinas", icon: Dumbbell },
     { href: "/dashboard/community", label: "Comunidad", icon: Users },
     { href: "/dashboard/profile", label: "Perfil", icon: User },
+    { href: "/dashboard/qr", label: "Acceso QR", icon: QrCode },
 ];
 
 export function Sidebar() {

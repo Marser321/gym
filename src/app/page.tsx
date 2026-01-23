@@ -46,7 +46,7 @@ export default function Home() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-cyan opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-neon-cyan"></span>
               </span>
-              Plataforma v2.0 Disponible
+              SISTEMA DE ÉLITE REINVENTADO 2026
             </div>
 
             <h1 className="mb-6 text-5xl font-black tracking-tighter sm:text-7xl lg:text-9xl text-white drop-shadow-2xl">
