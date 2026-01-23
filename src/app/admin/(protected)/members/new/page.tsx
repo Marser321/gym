@@ -4,7 +4,8 @@ import { CrystalCard } from "@/components/crystal/CrystalCard";
 import { CrystalButton } from "@/components/crystal/CrystalButton";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, Star, Check, ArrowLeft } from "lucide-react";
+import { Upload, Star, Check, ArrowLeft, Loader2, UserPlus } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
 const PLANS = [
@@ -15,34 +16,63 @@ const PLANS = [
 
 export default function NewMemberPage() {
     const router = useRouter();
+    const supabase = createClient();
     const [selectedPlan, setSelectedPlan] = useState(PLANS[1].id);
+    const [isLoading, setIsLoading] = useState(false);
+
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
         phone: "",
-        dni: ""
+        id: "" // We will use this as a manual UUID for the profile record
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Here we would call Supabase API
-        console.log("Creating member:", { ...formData, plan: selectedPlan });
+        setIsLoading(true);
 
-        // Simulate loading
-        // then redirect
-        alert("Socio registrado exitosamente. Credenciales enviadas por email.");
-        router.push("/admin/members");
+        try {
+            // Generamos un ID si no hay uno (en producción esto vendría de Auth)
+            const userId = crypto.randomUUID();
+            const qrToken = encodeURIComponent(formData.fullName.substring(0, 3) + Math.floor(Math.random() * 10000));
+
+            const { error } = await supabase
+                .from("profiles")
+                .insert([
+                    {
+                        id: userId,
+                        full_name: formData.fullName,
+                        phone: formData.phone,
+                        qr_code_token: qrToken,
+                        rank_name: selectedPlan === 'anual' ? 'Oro' : 'Bronce',
+                        level: 1
+                    }
+                ]);
+
+            if (error) throw error;
+
+            alert("Socio registrado exitosamente en la base de datos.");
+            router.push("/admin/members");
+            router.refresh();
+        } catch (err: any) {
+            console.error("Error creating member:", err);
+            alert("Error al registrar socio: " + err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <div className="space-y-6 max-w-5xl mx-auto">
-            <div className="flex items-center gap-4">
-                <Link href="/admin/members" className="p-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors">
-                    <ArrowLeft className="h-5 w-5" />
-                </Link>
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Registrar Nuevo Socio</h1>
-                    <p className="text-gray-400 text-sm">Ingreso de datos y asignación de plan</p>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Link href="/admin/members" className="p-2 rounded-xl bg-white/5 text-gray-400 hover:text-white transition-all border border-white/10">
+                        <ArrowLeft className="h-5 w-5" />
+                    </Link>
+                    <div>
+                        <h1 className="text-2xl font-black text-white uppercase tracking-tight italic">Registrar Nuevo Socio</h1>
+                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Panel de Alta Directa</p>
+                    </div>
                 </div>
             </div>
 
@@ -50,52 +80,62 @@ export default function NewMemberPage() {
 
                 {/* Left Column: Personal Data */}
                 <div className="lg:col-span-2 space-y-6">
-                    <CrystalCard className="p-6 space-y-6">
-                        <h2 className="text-lg font-semibold text-white border-b border-white/10 pb-2">Datos Personales</h2>
+                    <CrystalCard className="p-8 space-y-8" hoverEffect={false}>
+                        <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+                            <UserPlus className="h-5 w-5 text-neon-cyan" />
+                            <h2 className="text-sm font-black text-white uppercase tracking-widest">Información Personal</h2>
+                        </div>
 
-                        <div className="flex items-start gap-6">
-                            <div className="h-24 w-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors group relative overflow-hidden">
-                                <Upload className="h-8 w-8 text-gray-400 group-hover:text-white" />
-                                <span className="absolute bottom-2 text-[10px] text-gray-500">Subir Foto</span>
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8">
+                            <div className="h-32 w-32 rounded-3xl bg-black/40 border border-white/10 flex flex-col items-center justify-center cursor-pointer hover:bg-neon-cyan/5 hover:border-neon-cyan/30 transition-all group shrink-0 relative">
+                                <Upload className="h-8 w-8 text-gray-600 group-hover:text-neon-cyan transition-colors" />
+                                <span className="mt-2 text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Avatar</span>
                             </div>
-                            <div className="flex-1 space-y-4">
-                                <div>
-                                    <label className="block text-xs font-medium text-gray-400 mb-1">Nombre Completo</label>
+
+                            <div className="flex-1 w-full space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Nombre Completo</label>
                                     <input
                                         type="text"
                                         required
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-neon-cyan/50"
+                                        placeholder="Ej: Juan Perez"
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all"
                                         value={formData.fullName}
                                         onChange={e => setFormData({ ...formData, fullName: e.target.value })}
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-400 mb-1">DNI / Pasaporte</label>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">DNI / Documento</label>
                                         <input
                                             type="text"
                                             required
-                                            className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-neon-cyan/50"
+                                            placeholder="12.345.678"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all"
                                             value={formData.dni}
                                             onChange={e => setFormData({ ...formData, dni: e.target.value })}
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-400 mb-1">Teléfono</label>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">WhatsApp</label>
                                         <input
                                             type="tel"
-                                            className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-neon-cyan/50"
+                                            placeholder="099..."
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all"
                                             value={formData.phone}
                                             onChange={e => setFormData({ ...formData, phone: e.target.value })}
                                         />
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-medium text-gray-400 mb-1">Email (Usuario)</label>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Correo Electrónico</label>
                                     <input
                                         type="email"
                                         required
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-neon-cyan/50"
+                                        placeholder="usuario@ejemplo.com"
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all"
                                         value={formData.email}
                                         onChange={e => setFormData({ ...formData, email: e.target.value })}
                                     />
@@ -103,54 +143,44 @@ export default function NewMemberPage() {
                             </div>
                         </div>
                     </CrystalCard>
-
-                    {/* Submit Button (Mobile) */}
-                    <div className="lg:hidden">
-                        <CrystalButton type="submit" className="w-full">Confirmar Registro</CrystalButton>
-                    </div>
                 </div>
 
                 {/* Right Column: Plan Selection */}
                 <div className="space-y-6">
-                    <CrystalCard className="p-6 space-y-4">
-                        <h2 className="text-lg font-semibold text-white border-b border-white/10 pb-2">Membresía</h2>
+                    <CrystalCard className="p-8 space-y-6 h-full" hoverEffect={false}>
+                        <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+                            <Star className="h-5 w-5 text-neon-cyan" />
+                            <h2 className="text-sm font-black text-white uppercase tracking-widest">Plan de Socio</h2>
+                        </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {PLANS.map((plan) => (
                                 <div
                                     key={plan.id}
                                     onClick={() => setSelectedPlan(plan.id)}
-                                    className={`relative p-4 rounded-xl border cursor-pointer transition-all ${selectedPlan === plan.id ? 'bg-neon-cyan/10 border-neon-cyan shadow-[0_0_15px_rgba(0,243,255,0.15)]' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
+                                    className={`relative p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${selectedPlan === plan.id ? 'bg-neon-cyan/10 border-neon-cyan shadow-[0_0_20px_rgba(0,243,255,0.1)]' : 'bg-black/20 border-white/5 hover:border-white/20'}`}
                                 >
-                                    {plan.recommended && (
-                                        <div className="absolute -top-3 right-4 px-2 py-0.5 bg-neon-purple text-[10px] font-bold text-white rounded-full">
-                                            RECOMENDADO
-                                        </div>
-                                    )}
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h3 className={`font-bold ${selectedPlan === plan.id ? 'text-white' : 'text-gray-300'}`}>{plan.name}</h3>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className={`text-xs font-black uppercase tracking-widest ${selectedPlan === plan.id ? 'text-neon-cyan' : 'text-gray-500'}`}>{plan.name}</h3>
                                         {selectedPlan === plan.id && <Check className="h-4 w-4 text-neon-cyan" />}
                                     </div>
-                                    <div className="text-xl font-bold text-white mb-2">
-                                        ${plan.price.toLocaleString()} <span className="text-xs font-normal text-gray-500">/ {plan.duration}</span>
+                                    <div className="text-2xl font-black text-white italic">
+                                        ${plan.price.toLocaleString()} <span className="text-[10px] font-normal text-gray-500 tracking-normal opacity-60">/ {plan.duration}</span>
                                     </div>
-                                    <ul className="text-xs text-gray-400 space-y-1">
-                                        {plan.features.slice(0, 2).map((feat, i) => (
-                                            <li key={i} className="flex items-center gap-1.5">
-                                                <div className="h-1 w-1 rounded-full bg-gray-500" /> {feat}
-                                            </li>
-                                        ))}
-                                    </ul>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="pt-4 border-t border-white/10">
-                            <CrystalButton type="submit" className="w-full text-lg h-12">
-                                Confirmar Registro
+                        <div className="pt-8 space-y-4">
+                            <CrystalButton
+                                type="submit"
+                                className="w-full text-sm font-black tracking-widest h-14 shadow-[0_0_30px_rgba(0,243,255,0.2)]"
+                                isLoading={isLoading}
+                            >
+                                ACTIVAR SOCIO
                             </CrystalButton>
-                            <p className="text-center text-[10px] text-gray-500 mt-2">
-                                Al confirmar, se enviará un email de bienvenida.
+                            <p className="text-center text-[10px] text-gray-500 uppercase font-medium leading-relaxed">
+                                Al confirmar, se creará el perfil del socio y se activará su código QR de acceso.
                             </p>
                         </div>
                     </CrystalCard>
