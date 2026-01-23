@@ -11,14 +11,27 @@ import Link from "next/link";
 
 export default async function DashboardPage() {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData?.user;
+
+    if (!user) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <p className="text-gray-400">Debes iniciar sesión para ver tu progreso.</p>
+            </div>
+        );
+    }
 
     // Fetch user profile securely
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user?.id)
+        .eq("id", user.id)
         .single();
+
+    if (profileError && profileError.code !== 'PGRST116') {
+        console.error("Error fetching profile:", profileError);
+    }
 
     return (
         <div className="space-y-8">
