@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import React, { useState } from "react";
 
 interface DataPoint {
     label: string;
@@ -15,7 +15,14 @@ interface CrystalAreaChartProps {
 }
 
 export function CrystalAreaChart({ data, color = "#00f3ff", height = 200 }: CrystalAreaChartProps) {
-    const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
+    const [mounted, setMounted] = React.useState(false);
+    const [hoveredPoint, setHoveredPoint] = React.useState<number | null>(null);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return <div style={{ height: `${height}px` }} className="w-full bg-white/5 animate-pulse rounded-xl" />;
 
     // Normalize data for SVG
     const maxValue = Math.max(...data.map(d => d.value));

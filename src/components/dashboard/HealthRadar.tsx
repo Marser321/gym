@@ -2,6 +2,7 @@
 
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Tooltip } from "recharts";
 import { CrystalCard } from "../crystal/CrystalCard";
+import { useEffect, useState } from "react";
 
 const data = [
     { subject: 'Fuerza', A: 120, fullMark: 150 },
@@ -13,6 +14,15 @@ const data = [
 ];
 
 export function HealthRadar() {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return <CrystalCard className="p-6 h-full flex flex-col animate-pulse bg-white/5">{null}</CrystalCard>;
+    }
     return (
         <CrystalCard className="p-6 h-full flex flex-col" hoverEffect>
             <div className="mb-4">
