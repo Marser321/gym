@@ -4,7 +4,7 @@ import { CrystalCard } from "@/components/crystal/CrystalCard";
 import { ProgressRing } from "@/components/crystal/ProgressRing";
 import { LevelProgress } from "@/components/gamification/LevelProgress";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { Dumbbell, Trophy, Users, Activity, Clock, Calendar, MapPin, Timer } from "lucide-react";
+import { Dumbbell, Trophy, Users, Activity, Clock, Calendar, MapPin, Timer, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardPage() {
@@ -89,6 +89,20 @@ export default async function DashboardPage() {
 
                     {/* Quick Actions Grid */}
                     <div className="grid gap-4 sm:grid-cols-2">
+                        <Link href="/dashboard/nexus">
+                            <CrystalCard className="flex items-center space-x-4 p-4 hover:bg-neon-cyan/5 cursor-pointer border-neon-cyan/30 shadow-[0_0_15px_rgba(0,243,255,0.1)] relative overflow-hidden" tilt>
+                                <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/10 via-transparent to-transparent opacity-20" />
+                                <div className="bg-deep-charcoal p-3 rounded-xl border border-neon-cyan h-12 w-12 flex items-center justify-center relative z-10">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-cyan opacity-20"></span>
+                                    <Sparkles className="h-6 w-6 text-neon-cyan" />
+                                </div>
+                                <div className="relative z-10">
+                                    <h3 className="font-bold text-white tracking-wide italic uppercase">Nexus AI Coach</h3>
+                                    <p className="text-xs text-neon-cyan">Calibrar Rutina Diaria &gt;&gt;</p>
+                                </div>
+                            </CrystalCard>
+                        </Link>
+
                         <Link href="/dashboard/routines">
                             <CrystalCard className="flex items-center space-x-4 p-4 hover:bg-white/5 cursor-pointer h-full" tilt>
                                 <div className="bg-neon-cyan/10 p-3 rounded-xl border border-neon-cyan/20">

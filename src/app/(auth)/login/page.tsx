@@ -7,6 +7,7 @@ import { Lock, Mail, Dumbbell, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -162,8 +163,13 @@ export default function LoginPage() {
                             </div>
                         </form>
 
-                        <div className="mt-8 text-center text-xs text-gray-500">
-                            ¿Olvidaste tu contraseña? <span className="cursor-pointer text-neon-cyan hover:underline">Recuperar</span>
+                        <div className="mt-8 text-center text-xs text-gray-500 flex flex-col gap-2">
+                            <div>
+                                ¿Olvidaste tu contraseña? <span className="cursor-pointer text-neon-cyan hover:underline">Recuperar</span>
+                            </div>
+                            <Link href="/admin" className="text-gray-700 hover:text-gray-500 transition-colors mt-4">
+                                Acceso Staff
+                            </Link>
                         </div>
                     </CrystalCard>
                 </motion.div>
