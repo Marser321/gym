@@ -1,12 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 import React from "react";
 
 import { TiltWrapper } from "./TiltWrapper";
 
-interface CrystalCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface CrystalCardProps extends HTMLMotionProps<"div"> {
     children: React.ReactNode;
     hoverEffect?: boolean;
     tilt?: boolean;

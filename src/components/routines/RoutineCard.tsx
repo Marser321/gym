@@ -6,6 +6,7 @@ import { Play, Clock, BarChart } from "lucide-react";
 import Link from "next/link";
 
 interface RoutineCardProps {
+    id?: string;
     title: string;
     description: string;
     difficulty: "principiante" | "intermedio" | "avanzado";
