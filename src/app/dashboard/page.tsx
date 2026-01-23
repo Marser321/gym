@@ -46,26 +46,47 @@ export default async function DashboardPage() {
         );
     }
 
-    const { data: userData } = await supabase.auth.getUser();
-    const user = userData?.user;
+    let userData, user, profile, profileError;
 
-    if (!user) {
+    try {
+        const { data: ud } = await supabase.auth.getUser();
+        userData = ud;
+        user = userData?.user;
+
+        if (!user) {
+            return (
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <p className="text-gray-400">Debes iniciar sesión para ver tu progreso.</p>
+                </div>
+            );
+        }
+
+        // Fetch user profile securely
+        const { data: p, error: pe } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+
+        profile = p;
+        profileError = pe;
+
+        if (profileError && profileError.code !== 'PGRST116') {
+            console.error("Error fetching profile:", profileError);
+        }
+    } catch (e: any) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <p className="text-gray-400">Debes iniciar sesión para ver tu progreso.</p>
+            <div className="p-8 border border-red-500/20 bg-red-500/5 rounded-2xl">
+                <h2 className="text-red-500 font-bold mb-2">Error Crítico al Cargar Datos</h2>
+                <p className="text-sm text-gray-400 mb-4">No se pudo conectar con los servicios de datos.</p>
+                <pre className="text-[10px] bg-black/40 p-4 rounded-lg overflow-auto">
+                    {JSON.stringify({
+                        message: e.message,
+                        stack: e.stack?.substring(0, 200)
+                    }, null, 2)}
+                </pre>
             </div>
         );
-    }
-
-    // Fetch user profile securely
-    const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-    if (profileError && profileError.code !== 'PGRST116') {
-        console.error("Error fetching profile:", profileError);
     }
 
     return (

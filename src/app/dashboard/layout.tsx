@@ -14,8 +14,14 @@ export default async function DashboardLayout({
         redirect("/login");
     }
 
-    const { data: userData } = await supabase.auth.getUser();
-    const user = userData?.user;
+    let user;
+    try {
+        const { data: userData } = await supabase.auth.getUser();
+        user = userData?.user;
+    } catch (e) {
+        console.error("Layout Auth Error:", e);
+        redirect("/login");
+    }
 
     if (!user) {
         redirect("/login");
