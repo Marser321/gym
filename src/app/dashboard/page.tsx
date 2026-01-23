@@ -4,6 +4,8 @@ import { CrystalCard } from "@/components/crystal/CrystalCard";
 import { ProgressRing } from "@/components/crystal/ProgressRing";
 import { LevelProgress } from "@/components/gamification/LevelProgress";
 import { StatCard } from "@/components/dashboard/StatCard";
+import { CrystalAreaChart } from "@/components/admin/CrystalAreaChart";
+import { HealthRadar } from "@/components/dashboard/HealthRadar";
 import { Dumbbell, Trophy, Users, Activity, Clock, Calendar, MapPin, Timer, Sparkles } from "lucide-react";
 import Link from "next/link";
 
@@ -30,7 +32,43 @@ export default async function DashboardPage() {
                 </div>
             </div>
 
-            {/* Stats Row */}
+            {/* Evolution & Health Grid */}
+            <div className="grid gap-6 md:grid-cols-3 h-[300px]">
+                {/* Line Chart - Evolution */}
+                <div className="md:col-span-2">
+                    <CrystalCard className="p-6 h-full flex flex-col justify-between" hoverEffect>
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 className="text-lg font-bold text-white">Consistencia Mensual</h3>
+                                <p className="text-sm text-gray-400">Volumen de entrenamiento (kg totales)</p>
+                            </div>
+                            <div className="text-neon-cyan font-mono text-xs bg-neon-cyan/10 px-2 py-1 rounded border border-neon-cyan/20">
+                                +12.5% vs Mes Anterior
+                            </div>
+                        </div>
+                        <div className="flex-1 w-full">
+                            <CrystalAreaChart
+                                height={200}
+                                color="#00f3ff"
+                                data={[
+                                    { label: 'Sem 1', value: 4500 },
+                                    { label: 'Sem 2', value: 5200 },
+                                    { label: 'Sem 3', value: 4800 },
+                                    { label: 'Sem 4', value: 6100 },
+                                    { label: 'Actual', value: 7500 },
+                                ]}
+                            />
+                        </div>
+                    </CrystalCard>
+                </div>
+
+                {/* Radar Chart - Health */}
+                <div className="md:col-span-1">
+                    <HealthRadar />
+                </div>
+            </div>
+
+            {/* Key Stats Row */}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <StatCard
                     title="Entrenamientos"
