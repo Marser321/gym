@@ -5,6 +5,14 @@ import { CrystalCard } from "@/components/crystal/CrystalCard";
 export default async function RoutinesPage() {
     const supabase = await createClient();
 
+    if (!supabase) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 text-center opacity-60">
+                <p className="text-lg text-gray-300">Error de conexión con la base de datos.</p>
+            </div>
+        );
+    }
+
     // Fetch routines
     const { data: routines } = await supabase
         .from("routines")

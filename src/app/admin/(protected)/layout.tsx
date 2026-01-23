@@ -10,7 +10,23 @@ export default async function AdminLayout({
     children: React.ReactNode;
 }) {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!supabase) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-deep-charcoal p-4">
+                <div className="w-full max-w-md space-y-4 rounded-3xl border border-red-500/20 bg-black/40 p-8 text-center backdrop-blur-xl">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
+                        <Settings className="h-6 w-6 text-red-500" />
+                    </div>
+                    <h2 className="text-xl font-bold text-white">Error de Configuración</h2>
+                    <p className="text-sm text-gray-400">No se encontraron las variables de entorno de Supabase necesarias para el panel administrativo.</p>
+                </div>
+            </div>
+        );
+    }
+
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData?.user;
 
     const cookieStore = await cookies();
     const hasAccess = cookieStore.get("admin_access");

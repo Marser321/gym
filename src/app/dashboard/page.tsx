@@ -11,6 +11,41 @@ import Link from "next/link";
 
 export default async function DashboardPage() {
     const supabase = await createClient();
+
+    if (!supabase) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 glass-card rounded-3xl border border-red-500/20 my-10 max-w-2xl mx-auto">
+                <div className="bg-red-500/10 p-4 rounded-full mb-6">
+                    <Activity className="h-12 w-12 text-red-500" />
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">Error de Configuración</h2>
+                <p className="text-gray-400 mb-8">No se pudieron detectar las credenciales de la base de datos necesaria para mostrar tu progreso.</p>
+
+                <div className="bg-black/40 p-6 rounded-2xl text-left font-mono text-xs w-full border border-white/5">
+                    <p className="text-gray-500 mb-2 uppercase tracking-widest text-[10px]">Estado de Conexión:</p>
+                    <div className="space-y-2">
+                        <div className="flex justify-between border-b border-white/5 pb-2">
+                            <span className="text-gray-400">SUPABASE_URL:</span>
+                            <span className={process.env.NEXT_PUBLIC_SUPABASE_URL ? "text-green-400" : "text-red-500"}>
+                                {process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Configurada ✅' : 'Faltante ❌'}
+                            </span>
+                        </div>
+                        <div className="flex justify-between border-b border-white/5 pb-2">
+                            <span className="text-gray-400">SUPABASE_ANON_KEY:</span>
+                            <span className={process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "text-green-400" : "text-red-500"}>
+                                {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Configurada ✅' : 'Faltante ❌'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <p className="mt-8 text-sm text-gray-500 italic">
+                    Si eres el administrador, verifica el panel de Vercel.
+                </p>
+            </div>
+        );
+    }
+
     const { data: userData } = await supabase.auth.getUser();
     const user = userData?.user;
 

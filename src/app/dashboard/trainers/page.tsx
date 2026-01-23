@@ -8,6 +8,14 @@ const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1571019614242-c5c5dee9
 export default async function TrainersPage() {
     const supabase = await createClient();
 
+    if (!supabase) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 text-center opacity-60">
+                <p className="text-lg text-gray-300">Error de conexión con la base de datos.</p>
+            </div>
+        );
+    }
+
     // Fetch trainers with profile details
     const { data: trainers } = await supabase
         .from("trainers")
