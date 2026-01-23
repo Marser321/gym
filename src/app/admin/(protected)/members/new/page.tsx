@@ -24,6 +24,7 @@ export default function NewMemberPage() {
         fullName: "",
         email: "",
         phone: "",
+        dni: "",
         id: "" // We will use this as a manual UUID for the profile record
     });
 
