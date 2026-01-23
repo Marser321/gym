@@ -127,6 +127,16 @@ export default function LoginPage() {
                                 />
                             </div>
 
+                            <div className="flex justify-between w-full text-xs text-gray-400 mb-6">
+                                <label className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
+                                    <input type="checkbox" className="rounded border-white/10 bg-white/5 text-neon-cyan focus:ring-neon-cyan/50" />
+                                    Recordarme
+                                </label>
+                                <Link href="/forgot-password" className="hover:text-neon-cyan transition-colors">
+                                    ¿Olvidaste tu contraseña?
+                                </Link>
+                            </div>
+
                             <button
                                 type="submit"
                                 disabled={isLoading}
@@ -144,7 +154,7 @@ export default function LoginPage() {
                         </form>
 
                         <div className="relative z-10 mt-8 flex flex-col items-center gap-4 text-xs text-gray-500">
-                            <Link href="#" className="hover:text-neon-cyan transition-colors">
+                            <Link href="/signup" className="hover:text-neon-cyan transition-colors">
                                 ¿No tienes cuenta? <span className="font-bold text-white">Solicitar Membresía</span>
                             </Link>
                             <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />

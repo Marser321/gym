@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { CrystalButton } from "@/components/crystal/CrystalButton";
-import { ArrowRight, Play, CheckCircle } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, Play, CheckCircle, X } from "lucide-react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export default function Home() {
+  const [showVideo, setShowVideo] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -68,7 +69,10 @@ export default function Home() {
                 </CrystalButton>
               </Link>
 
-              <button className="group flex items-center gap-3 px-8 py-4 text-gray-300 hover:text-white transition-colors">
+              <button
+                onClick={() => setShowVideo(true)}
+                className="group flex items-center gap-3 px-8 py-4 text-gray-300 hover:text-white transition-colors"
+              >
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 border border-white/20 group-hover:bg-white/20 transition-all">
                   <Play className="h-5 w-5 fill-current ml-1" />
                 </div>
@@ -138,6 +142,36 @@ export default function Home() {
           © 2026 GYM PREMIUM FITNESS. Powered by <span className="text-neon-cyan">Nexus AI</span>.
         </p>
       </footer>
+      {/* Video Modal */}
+      <AnimatePresence>
+        {showVideo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-4"
+            onClick={() => setShowVideo(false)}
+          >
+            <div className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+              <button
+                onClick={() => setShowVideo(false)}
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-white/20 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+                title="Gym Premium Showreel"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
