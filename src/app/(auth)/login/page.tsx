@@ -1,13 +1,12 @@
 "use client";
 
-import { CrystalCard } from "@/components/crystal/CrystalCard";
-import { CrystalButton } from "@/components/crystal/CrystalButton";
 import { motion } from "framer-motion";
-import { Lock, Mail, Dumbbell, AlertCircle } from "lucide-react";
+import { Lock, Mail, Dumbbell, ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -29,149 +28,131 @@ export default function LoginPage() {
             });
 
             if (error) {
-                // Si el error es credenciales inválidas, intenta registrar (por conveniencia en demo)
-                // O muestra el error real.
                 if (error.message.includes("Invalid login credentials")) {
-                    throw new Error("Credenciales incorrectas. Si eres nuevo, regístrate o contacta al admin.");
+                    throw new Error("Credenciales inválidas.");
                 }
                 throw error;
             }
 
-            // Éxito
             router.push("/dashboard");
             router.refresh();
         } catch (err: any) {
-            setError(err.message || "Ocurrió un error al iniciar sesión");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleSignUp = async () => {
-        // Simple signup helper for demo purposes
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const { error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        full_name: email.split("@")[0], // Default name from email
-                        avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}` // Auto avatar
-                    }
-                }
-            });
-
-            if (error) throw error;
-
-            alert("Cuenta creada! Revisa tu email para confirmar o inicia sesión si el auto-confirm está activo (local).");
-            // Try auto-login after signup just in case
-            await supabase.auth.signInWithPassword({ email, password });
-            router.push("/dashboard");
-        } catch (err: any) {
-            setError(err.message || "Error al registrarse");
+            setError(err.message || "Error al iniciar sesión");
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-background">
-            {/* Background Image with heavy blur and overlay */}
-            <div
-                className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop')] bg-cover bg-center"
-            >
-                <div className="absolute inset-0 bg-deep-charcoal/80 backdrop-blur-md" />
+        <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-black font-sans text-white">
+            {/* Cinematic Background */}
+            <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
+                <motion.div
+                    initial={{ scale: 1 }}
+                    animate={{ scale: 1.1 }}
+                    transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
+                    className="h-full w-full bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop')] bg-cover bg-center opacity-60"
+                />
             </div>
 
-            {/* Login Card */}
-            <div className="z-10 w-full max-w-md px-4">
+            {/* Login Container */}
+            <div className="z-20 w-full max-w-md px-6">
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="relative"
                 >
-                    <CrystalCard className="border-white/10 p-8 shadow-2xl">
-                        <div className="mb-8 flex flex-col items-center text-center">
-                            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan shadow-[0_0_15px_rgba(0,243,255,0.2)]">
-                                <Dumbbell className="h-8 w-8" />
-                            </div>
-                            <h1 className="text-3xl font-bold text-white tracking-tight text-glow">
+                    {/* Decorative Elements */}
+                    <div className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-neon-cyan/20 blur-[100px]" />
+                    <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-purple-500/20 blur-[100px]" />
+
+                    {/* Glass Card */}
+                    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 p-8 shadow-2xl backdrop-blur-2xl">
+                        {/* Scanline Effect */}
+                        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-[1] bg-[length:100%_2px,3px_100%] opacity-20" />
+
+                        {/* Brand Header */}
+                        <div className="relative z-10 mb-8 flex flex-col items-center">
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                                className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-tr from-neon-cyan/20 to-blue-600/20 border border-white/10 shadow-[0_0_30px_rgba(0,243,255,0.3)]"
+                            >
+                                <Dumbbell className="h-10 w-10 text-neon-cyan drop-shadow-[0_0_10px_rgba(0,243,255,0.8)]" />
+                            </motion.div>
+                            <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">
                                 GYM PREMIUM
                             </h1>
-                            <p className="mt-2 text-sm text-gray-400">
-                                Acceso exclusivo para miembros
+                            <p className="mt-2 text-sm font-medium text-neon-cyan/80 tracking-widest uppercase">
+                                Acceso Exclusivo
                             </p>
                         </div>
 
-                        {error && (
-                            <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-500/10 p-3 text-sm text-red-400 border border-red-500/20">
-                                <AlertCircle className="h-4 w-4" />
-                                {error}
-                            </div>
-                        )}
-
-                        <form onSubmit={handleLogin} className="space-y-6">
-                            <div className="space-y-2">
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
-                                    <input
-                                        type="email"
-                                        placeholder="tucorreo@ejemplo.com"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                        className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-white placeholder-gray-500 backdrop-blur-sm focus:border-neon-cyan/50 focus:outline-none focus:ring-1 focus:ring-neon-cyan/50 transition-all"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
-                                    <input
-                                        type="password"
-                                        placeholder="••••••••"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                        className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-white placeholder-gray-500 backdrop-blur-sm focus:border-neon-cyan/50 focus:outline-none focus:ring-1 focus:ring-neon-cyan/50 transition-all"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-3">
-                                <CrystalButton
-                                    type="submit"
-                                    className="w-full text-lg font-semibold tracking-wide"
-                                    size="lg"
-                                    isLoading={isLoading}
+                        {/* Form */}
+                        <form onSubmit={handleLogin} className="relative z-10 space-y-5">
+                            {error && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    className="rounded-lg bg-red-500/10 border border-red-500/20 p-3 text-center text-xs font-bold text-red-400"
                                 >
-                                    INGRESAR
-                                </CrystalButton>
+                                    {error}
+                                </motion.div>
+                            )}
 
-                                <button
-                                    type="button"
-                                    onClick={handleSignUp}
-                                    disabled={isLoading || !email || !password}
-                                    className="text-xs text-gray-500 hover:text-white transition-colors"
-                                >
-                                    ¿Nuevo aquí? <span className="underline">Crear cuenta rápida</span>
-                                </button>
+                            <div className="group relative">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 transition-colors group-focus-within:text-neon-cyan" />
+                                <input
+                                    type="email"
+                                    placeholder="tucorreo@ejemplo.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white placeholder-gray-600 outline-none transition-all focus:border-neon-cyan/50 focus:bg-white/10 focus:ring-1 focus:ring-neon-cyan/50"
+                                />
                             </div>
+
+                            <div className="group relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 transition-colors group-focus-within:text-neon-cyan" />
+                                <input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white placeholder-gray-600 outline-none transition-all focus:border-neon-cyan/50 focus:bg-white/10 focus:ring-1 focus:ring-neon-cyan/50"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-neon-cyan py-4 text-lg font-bold text-black transition-all hover:bg-cyan-300 hover:shadow-[0_0_20px_rgba(0,243,255,0.4)] disabled:cursor-not-allowed disabled:opacity-70"
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="h-6 w-6 animate-spin" />
+                                ) : (
+                                    <>
+                                        INGRESAR
+                                        <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                                    </>
+                                )}
+                            </button>
                         </form>
 
-                        <div className="mt-8 text-center text-xs text-gray-500 flex flex-col gap-2">
-                            <div>
-                                ¿Olvidaste tu contraseña? <span className="cursor-pointer text-neon-cyan hover:underline">Recuperar</span>
-                            </div>
-                            <Link href="/admin" className="text-gray-700 hover:text-gray-500 transition-colors mt-4">
-                                Acceso Staff
+                        <div className="relative z-10 mt-8 flex flex-col items-center gap-4 text-xs text-gray-500">
+                            <Link href="#" className="hover:text-neon-cyan transition-colors">
+                                ¿No tienes cuenta? <span className="font-bold text-white">Solicitar Membresía</span>
+                            </Link>
+                            <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                            <Link href="/admin" className="flex items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                                <Lock className="h-3 w-3" /> Acceso Staff
                             </Link>
                         </div>
-                    </CrystalCard>
+                    </div>
                 </motion.div>
             </div>
         </div>
