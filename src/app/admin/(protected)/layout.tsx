@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { LayoutDashboard, Users, CreditCard, Dumbbell, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
 
@@ -11,18 +12,12 @@ export default async function AdminLayout({
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    // In a real app we'd check server-side cookie/role
-    // For this demo flow, we assume access if user is logged in OR has admin cookie
-    // But since the user specifically asked for a PIN gate 0000, 
-    // let's just make the layout accessible and rely on the PIN page to redirect HERE.
-    // However, to be cleaner:
+    const cookieStore = await cookies();
+    const hasAccess = cookieStore.get("admin_access");
 
-    // If we want to strictly enforce the PIN flow, we could check cookies(), 
-    // but in a Server Component we can just allow rendering and trust the flow for now,
-    // or add a client-side check. Let's redirect to admin login if no user session found at all as fallback.
-
-    // For now: Just render children. The "Gate" is the entry point.
-    // Ideally: Check cookie 'admin_access'.
+    if (!hasAccess) {
+        redirect("/admin/login");
+    }
 
 
     const menuItems = [
