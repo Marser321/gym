@@ -1,0 +1,57 @@
+
+> gym-premium@0.1.0 build
+> next build
+
+▲ Next.js 16.1.4 (Turbopack)
+- Environments: .env.local
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+Error: Cannot apply unknown utility class `border-border`
+    [2m[at onInvalidCandidate (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\tailwindcss\dist\lib.js:21:1511)][0m
+    [2m[at Te (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\tailwindcss\dist\lib.js:16:36652)][0m
+    [2m[at C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\tailwindcss\dist\lib.js:21:355][0m
+    [2m[at Rr (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\tailwindcss\dist\lib.js:3:1718)][0m
+    [2m[at _ (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\tailwindcss\dist\lib.js:3:1377)][0m
+    [2m[at $e (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\tailwindcss\dist\lib.js:21:172)][0m
+    [2m[at un (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\tailwindcss\dist\lib.js:38:294)][0m
+    [2m[at async cn (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\tailwindcss\dist\lib.js:38:631)][0m
+    [2m[at async Xr (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\@tailwindcss\node\dist\index.js:10:3417)][0m
+    [2m[at async I (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\@tailwindcss\postcss\dist\index.js:10:3977)][0m
+Turbopack build encountered 1 warnings:
+./tailwind.config.ts:86:12
+Module not found: Can't resolve 'tailwindcss-animate'
+[0m [90m 84 |[39m 		}
+ [90m 85 |[39m 	}[33m,[39m
+[31m[1m>[22m[39m[90m 86 |[39m 	plugins[33m:[39m [require([32m"tailwindcss-animate"[39m)][33m,[39m
+ [90m    |[39m 	          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 87 |[39m }[33m;[39m
+ [90m 88 |[39m [36mexport[39m [36mdefault[39m config[33m;[39m
+ [90m 89 |[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\src\app\globals.css:1:1: Cannot apply unknown utility class `border-border`
+    at Input.error (node_modules/postcss/lib/input.js:135:16) [C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\.next\build\chunks\node_modules_fe693df6._.js:4651:22]
+    at Root.error (node_modules/postcss/lib/node.js:146:32) [C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\.next\build\chunks\node_modules_fe693df6._.js:928:38]
+    [at Object.Once (C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    at async LazyResult.runAsync (node_modules/postcss/lib/lazy-result.js:293:11) [C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\.next\build\chunks\node_modules_fe693df6._.js:6206:21]
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34) [C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\.next\build\chunks\[root-of-the-server]__51225daf._.js:146:36]
+    at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23) [C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\.next\build\chunks\[root-of-the-server]__974941ed._.js:443:31]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+
+
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34) [C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\.next\build\chunks\[root-of-the-server]__51225daf._.js:146:36])
+    at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23) [C:\Users\morer\OneDrive\Desktop\GYMs\gym-premium\.next\build\chunks\[root-of-the-server]__974941ed._.js:443:31])
