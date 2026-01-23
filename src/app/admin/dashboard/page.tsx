@@ -10,6 +10,13 @@ export default function AdminDashboardPage() {
         { label: "Check-ins Hoy", value: "115", trend: "+18%", icon: TrendingUp, color: "orange-400" },
     ];
 
+    const colorMap: Record<string, string> = {
+        "neon-cyan": "bg-neon-cyan/10 border-neon-cyan/20 text-neon-cyan",
+        "purple-500": "bg-purple-500/10 border-purple-500/20 text-purple-500",
+        "green-400": "bg-green-400/10 border-green-400/20 text-green-400",
+        "orange-400": "bg-orange-400/10 border-orange-400/20 text-orange-400",
+    };
+
     return (
         <div className="space-y-8">
             {/* KPIs */}
@@ -19,7 +26,7 @@ export default function AdminDashboardPage() {
                     return (
                         <CrystalCard key={idx} className="p-6" hoverEffect>
                             <div className="flex items-center justify-between mb-4">
-                                <div className={`p-3 rounded-xl bg-${kpi.color}/10 border border-${kpi.color}/20 text-${kpi.color}`}>
+                                <div className={`p-3 rounded-xl border ${colorMap[kpi.color]}`}>
                                     <Icon className="h-6 w-6" />
                                 </div>
                                 <span className={`text-xs font-bold px-2 py-1 rounded-full ${kpi.trend.startsWith('+') ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
