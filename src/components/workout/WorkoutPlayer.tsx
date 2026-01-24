@@ -68,9 +68,41 @@ export function WorkoutPlayer({ routine, exercises, userId }: WorkoutPlayerProps
     const handleRestComplete = () => {
         setIsResting(false);
         // Haptics if available
-        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-        // Sound could go here
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate([200, 100, 200]);
+        }
     };
+
+    // -- Wake Lock --
+    useEffect(() => {
+        let wakeLock: any = null;
+
+        const requestWakeLock = async () => {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await (navigator as any).wakeLock.request('screen');
+                    console.log('Wake Lock active');
+                }
+            } catch (err) {
+                console.error("Wake Lock error:", err);
+            }
+        };
+
+        requestWakeLock();
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                requestWakeLock();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            if (wakeLock) wakeLock.release();
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
 
     // -- Actions --
     const handleFinishSet = async () => {
