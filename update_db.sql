@@ -103,3 +103,24 @@ drop policy if exists "Public read assignments" on public.trainer_assignments;
 create policy "Public read assignments" on public.trainer_assignments for select using (true);
 drop policy if exists "Staff manage assignments" on public.trainer_assignments;
 create policy "Staff manage assignments" on public.trainer_assignments for all using (true) with check (true);
+
+-- 4. TABLA: MESSAGES (Chat Entrenador-Cliente)
+create table if not exists public.messages (
+  id uuid default gen_random_uuid() primary key,
+  sender_id uuid references public.profiles(id) on delete cascade,
+  receiver_id uuid references public.profiles(id) on delete cascade,
+  content text not null,
+  is_read boolean default false,
+  created_at timestamptz default now()
+);
+alter table public.messages enable row level security;
+
+-- Políticas de Chat: Solo el emisor o receptor pueden ver/escribir
+drop policy if exists "Users view own messages" on public.messages;
+create policy "Users view own messages" on public.messages 
+  for select using (auth.uid() = sender_id or auth.uid() = receiver_id);
+
+drop policy if exists "Users insert own messages" on public.messages;
+create policy "Users insert own messages" on public.messages 
+  for insert with check (auth.uid() = sender_id);
+

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { QRCrystal } from "@/components/crystal/QRCrystal";
 import { CrystalCard } from "@/components/crystal/CrystalCard";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { Dumbbell, Trophy, Activity, Clock, Timer, Sparkles, ChevronRight } from "lucide-react";
+import { Dumbbell, Trophy, Activity, Clock, Timer, Sparkles, ChevronRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -44,10 +44,15 @@ export default async function DashboardPage() {
             console.error("Dashboard Profile Error:", profileError);
         }
 
-        // Continue with the rest of the component...
-        // I need to return the JSX here, so I will reconstruct the return statement inside the try block 
-        // or assign variables to use outside.
-        // To make this cleaner with the tool's limitations, I'll rewrite the component start to capture variables.
+        // Fetch Trainer
+        const { data: trainerAssig } = await supabase
+            .from("trainer_assignments")
+            .select(`
+                trainer:profiles!trainer_id (full_name)
+            `)
+            .eq("client_id", user.id)
+            .eq("status", "active")
+            .maybeSingle();
 
         return (
             <div className="space-y-8 pb-24">
@@ -57,7 +62,14 @@ export default async function DashboardPage() {
                         <h1 className="text-4xl font-black text-white tracking-tight italic uppercase">
                             BIENVENIDO, <span className="text-neon-cyan text-glow">{safeProfile.full_name?.split(' ')[0] || 'ATLETA'}</span>
                         </h1>
-                        <p className="text-gray-500 font-medium tracking-widest uppercase text-xs mt-1">Estatus: Premium • Nivel {safeProfile.level || 1}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                            <p className="text-gray-500 font-medium tracking-widest uppercase text-xs">Estatus: Premium • Nivel {safeProfile.level || 1}</p>
+                            {trainerAssig && (
+                                <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded text-gray-400 font-bold uppercase border border-white/5">
+                                    Coach: {(trainerAssig.trainer as any).full_name}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex-1 max-w-md w-full">
@@ -118,7 +130,7 @@ export default async function DashboardPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     <Link href="/dashboard/nexus">
                         <CrystalCard className="p-6 border-neon-cyan/30 bg-neon-cyan/5 group hover:bg-neon-cyan/10 transition-all">
                             <div className="flex items-center justify-between">
@@ -135,6 +147,25 @@ export default async function DashboardPage() {
                             </div>
                         </CrystalCard>
                     </Link>
+
+                    {trainerAssig && (
+                        <Link href="/dashboard/chat">
+                            <CrystalCard className="p-6 border-purple-500/30 bg-purple-500/5 group hover:bg-purple-500/10 transition-all">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 rounded-xl bg-purple-500 text-white flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                                            <MessageSquare className="h-6 w-6" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-white uppercase tracking-tight">Chat con Coach</h4>
+                                            <p className="text-xs text-gray-400">Consulta directa por mensaje</p>
+                                        </div>
+                                    </div>
+                                    <ChevronRight className="h-5 w-5 text-purple-500 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </CrystalCard>
+                        </Link>
+                    )}
 
                     <Link href="/dashboard/routines">
                         <CrystalCard className="p-6 group hover:bg-white/5 transition-all">

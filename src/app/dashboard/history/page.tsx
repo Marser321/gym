@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { CrystalCard } from "@/components/crystal/CrystalCard";
-import { Calendar, Dumbbell, Trophy } from "lucide-react";
+import { Calendar, Dumbbell, Trophy, Activity } from "lucide-react";
 import { redirect } from "next/navigation";
+import { VolumeChart } from "@/components/history/VolumeChart";
 
 export default async function HistoryPage() {
     const supabase = await createClient();
@@ -59,18 +60,36 @@ export default async function HistoryPage() {
         session.totalSets += 1;
         session.totalVolume += (log.weight || 0) * (log.reps || 0);
 
-        // Add simplified exercise stats
-        if (!session.exercises.includes(log.exercise?.name)) {
-            session.exercises.push(log.exercise?.name);
+        if (log.exercise?.name && !session.exercises.includes(log.exercise.name)) {
+            session.exercises.push(log.exercise.name);
         }
     });
 
+    // Prepare chart data
+    const chartData = sessions.map(s => ({
+        date: s.date,
+        volume: s.totalVolume,
+        sets: s.totalSets
+    })).slice(0, 10); // Show last 10 sessions in chart
+
     return (
         <div className="space-y-8 pb-24">
-            <div>
-                <h1 className="text-4xl font-black text-white italic uppercase tracking-tight">Historial</h1>
-                <p className="text-gray-400">Tus sesiones de entrenamiento pasadas.</p>
+            <div className="flex justify-between items-end">
+                <div>
+                    <h1 className="text-4xl font-black text-white italic uppercase tracking-tight">Historial</h1>
+                    <p className="text-gray-400">Tus sesiones de entrenamiento pasadas.</p>
+                </div>
             </div>
+
+            {sessions.length > 0 && (
+                <CrystalCard className="p-6">
+                    <div className="flex items-center gap-2 mb-4 text-neon-cyan opacity-80">
+                        <Activity className="h-4 w-4" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Evolución de Volumen (KG)</span>
+                    </div>
+                    <VolumeChart data={chartData} />
+                </CrystalCard>
+            )}
 
             <div className="space-y-4">
                 {sessions.length > 0 ? (
