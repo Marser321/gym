@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { QRCrystal } from "@/components/crystal/QRCrystal";
+
 import { CrystalCard } from "@/components/crystal/CrystalCard";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Dumbbell, Trophy, Activity, Clock, Timer, Sparkles, ChevronRight, MessageSquare } from "lucide-react";
@@ -118,11 +118,32 @@ export default async function DashboardPage() {
 
                     {/* QR Section */}
                     <div className="md:col-span-1">
-                        <CrystalCard className="p-6 flex flex-col items-center justify-center h-full" tilt>
-                            <QRCrystal
-                                token={safeProfile.qr_code_token || user.id}
-                                userName={safeProfile.full_name || "Miembro"}
-                            />
+                        <CrystalCard className="p-6 flex flex-col items-center justify-center h-full relative overflow-hidden" tilt>
+                            <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/5 to-purple-500/5" />
+
+                            <div className="relative z-10 flex flex-col items-center text-center">
+                                <div className="h-20 w-20 rounded-full bg-white/5 border border-neon-cyan/30 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,243,255,0.2)]">
+                                    <Trophy className="h-10 w-10 text-neon-cyan" />
+                                </div>
+
+                                <h3 className="text-xl font-black text-white uppercase italic tracking-wider mb-1">
+                                    MEMBRESÍA ACTIVA
+                                </h3>
+                                <p className="text-sm text-neon-cyan font-bold tracking-widest uppercase mb-6">
+                                    ACCESO TOTAL
+                                </p>
+
+                                <div className="w-full bg-white/5 rounded-xl p-3 border border-white/10">
+                                    <div className="flex justify-between items-center text-xs mb-1">
+                                        <span className="text-gray-400">ID de Miembro</span>
+                                        <span className="text-white font-mono">#{safeProfile.qr_code_token?.substring(0, 8) || '0000'}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-gray-400">Vence</span>
+                                        <span className="text-green-400 font-bold">RENOVACIÓN AUTO</span>
+                                    </div>
+                                </div>
+                            </div>
                         </CrystalCard>
                     </div>
                 </div>
