@@ -45,14 +45,20 @@ export default async function DashboardPage() {
         }
 
         // Fetch Trainer
-        const { data: trainerAssig } = await supabase
-            .from("trainer_assignments")
-            .select(`
-                trainer:profiles!trainer_id (full_name)
-            `)
-            .eq("client_id", user.id)
-            .eq("status", "active")
-            .maybeSingle();
+        let trainerAssig = null;
+        try {
+            const { data } = await supabase
+                .from("trainer_assignments")
+                .select(`
+                    trainer:profiles!trainer_id (full_name)
+                `)
+                .eq("client_id", user.id)
+                .eq("status", "active")
+                .maybeSingle();
+            trainerAssig = data;
+        } catch (err) {
+            console.error("Error fetching trainer assignment:", err);
+        }
 
         return (
             <div className="space-y-8 pb-24">
@@ -64,9 +70,9 @@ export default async function DashboardPage() {
                         </h1>
                         <div className="flex items-center gap-2 mt-1">
                             <p className="text-gray-500 font-medium tracking-widest uppercase text-xs">Estatus: Premium • Nivel {safeProfile.level || 1}</p>
-                            {trainerAssig && (
+                            {trainerAssig?.trainer && (
                                 <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded text-gray-400 font-bold uppercase border border-white/5">
-                                    Coach: {(trainerAssig.trainer as any).full_name}
+                                    Coach: {(trainerAssig.trainer as any)?.full_name || 'Asignado'}
                                 </span>
                             )}
                         </div>
