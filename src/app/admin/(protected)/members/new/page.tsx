@@ -44,6 +44,7 @@ export default function NewMemberPage() {
                         id: userId,
                         full_name: formData.fullName,
                         phone: formData.phone,
+                        dni: formData.dni,
                         qr_code_token: qrToken,
                         rank_name: selectedPlan === 'anual' ? 'Oro' : 'Bronce',
                         level: 1
