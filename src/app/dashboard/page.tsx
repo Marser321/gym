@@ -4,6 +4,7 @@ import { CrystalCard } from "@/components/crystal/CrystalCard";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Dumbbell, Trophy, Activity, Clock, Timer, Sparkles, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
     try {
@@ -22,24 +23,25 @@ export default async function DashboardPage() {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
-            console.error("Auth Error:", authError);
-            // Optional: Redirect to login here or show a friendly message
-            return (
-                <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
-                    <h2 className="text-xl font-bold text-white mb-2">Sesión Expirada</h2>
-                    <Link href="/login" className="text-neon-cyan hover:underline">Iniciar Sesión</Link>
-                </div>
-            );
+            redirect("/login");
         }
 
         const { data: profile, error: profileError } = await supabase
             .from("profiles")
             .select("*")
             .eq("id", user.id)
-            .maybeSingle(); // Changed to maybeSingle to prevent 406 error if profile missing
+            .single();
 
-        if (profileError) {
-            console.error("Profile Error:", profileError);
+        // Fail gracefully if profile doesn't exist yet (unlikely but possible)
+        const safeProfile = profile || {
+            full_name: user.email?.split('@')[0] || 'Atleta',
+            level: 1,
+            rank_name: 'Bronce',
+            qr_code_token: user.id
+        };
+
+        if (profileError && profileError.code !== 'PGRST116') {
+            console.error("Dashboard Profile Error:", profileError);
         }
 
         // Continue with the rest of the component...
@@ -52,9 +54,9 @@ export default async function DashboardPage() {
                 {/* Header */}
                 <div>
                     <h1 className="text-4xl font-black text-white tracking-tight italic uppercase">
-                        BIENVENIDO, <span className="text-neon-cyan text-glow">{profile?.full_name?.split(' ')[0] || 'ATLETA'}</span>
+                        BIENVENIDO, <span className="text-neon-cyan text-glow">{safeProfile.full_name?.split(' ')[0] || 'ATLETA'}</span>
                     </h1>
-                    <p className="text-gray-500 font-medium tracking-widest uppercase text-xs mt-1">Estatus: Premium • Nivel {profile?.level || 12}</p>
+                    <p className="text-gray-500 font-medium tracking-widest uppercase text-xs mt-1">Estatus: Premium • Nivel {safeProfile.level || 1}</p>
                 </div>
 
                 {/* Main Grid */}
@@ -85,8 +87,8 @@ export default async function DashboardPage() {
                     <div className="md:col-span-1">
                         <CrystalCard className="p-6 flex flex-col items-center justify-center h-full" tilt>
                             <QRCrystal
-                                token={profile?.qr_code_token || user.id}
-                                userName={profile?.full_name || "Miembro"}
+                                token={safeProfile.qr_code_token || user.id}
+                                userName={safeProfile.full_name || "Miembro"}
                             />
                         </CrystalCard>
                     </div>
@@ -97,7 +99,7 @@ export default async function DashboardPage() {
                     <StatCard title="Entrenamientos" value="18" icon={Dumbbell} trend="+3" trendUp />
                     <StatCard title="Calorías" value="4.2k" icon={Activity} trend="12%" trendUp />
                     <StatCard title="Tiempo" value="24h" icon={Clock} />
-                    <StatCard title="Rango" value={profile?.rank_name || "ORO"} icon={Trophy} />
+                    <StatCard title="Rango" value={safeProfile.rank_name || "BRONCE"} icon={Trophy} />
                 </div>
 
                 {/* Actions */}
