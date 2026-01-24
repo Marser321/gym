@@ -7,25 +7,25 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
+    const supabase = await createClient();
+
+    if (!supabase) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 glass-card rounded-3xl border border-red-500/20 my-10 max-w-2xl mx-auto">
+                <Activity className="h-12 w-12 text-red-500 mb-6" />
+                <h2 className="text-2xl font-bold text-white mb-2">Error de Configuración</h2>
+                <p className="text-gray-400">Faltan las variables de entorno de Supabase en Vercel.</p>
+            </div>
+        );
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        redirect("/login");
+    }
+
     try {
-        const supabase = await createClient();
-
-        if (!supabase) {
-            return (
-                <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 glass-card rounded-3xl border border-red-500/20 my-10 max-w-2xl mx-auto">
-                    <Activity className="h-12 w-12 text-red-500 mb-6" />
-                    <h2 className="text-2xl font-bold text-white mb-2">Error de Configuración</h2>
-                    <p className="text-gray-400">Faltan las variables de entorno de Supabase en Vercel.</p>
-                </div>
-            );
-        }
-
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-        if (authError || !user) {
-            redirect("/login");
-        }
-
         const { data: profile, error: profileError } = await supabase
             .from("profiles")
             .select("*")
@@ -61,27 +61,27 @@ export default async function DashboardPage() {
 
                 {/* Main Grid */}
                 <div className="grid gap-6 md:grid-cols-3">
-                    {/* Evolution Summary (Replacement for Chart to test stability) */}
-                    <CrystalCard className="md:col-span-2 p-8 flex flex-col justify-between overflow-hidden relative" hoverEffect>
-                        <div className="relative z-10">
-                            <h3 className="text-xl font-bold text-white mb-1">Tu Evolución</h3>
-                            <p className="text-sm text-gray-400">Has superado el 85% de tus objetivos este mes.</p>
-
-                            <div className="mt-8 flex gap-8">
-                                <div>
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-tighter">Carga Total</p>
-                                    <p className="text-2xl font-black text-white">12,450 <span className="text-xs text-gray-500 font-normal">KG</span></p>
+                    {/* My Routines Shortcut (New) */}
+                    <Link href="/dashboard/routines" className="md:col-span-2 group">
+                        <CrystalCard className="p-8 flex flex-col justify-between h-full relative overflow-hidden group-hover:border-neon-cyan/50 transition-all" hoverEffect>
+                            <div className="relative z-10">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <Dumbbell className="h-6 w-6 text-neon-cyan" />
+                                    <h3 className="text-2xl font-black text-white uppercase italic">Mis Rutinas</h3>
                                 </div>
-                                <div>
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-tighter">Frecuencia</p>
-                                    <p className="text-2xl font-black text-white">4.2 <span className="text-xs text-gray-500 font-normal">D/S</span></p>
+                                <p className="text-sm text-gray-400 max-w-md">Accede a tus planes de entrenamiento asignados y comienza tu sesión de hoy.</p>
+
+                                <div className="mt-8">
+                                    <span className="inline-flex items-center gap-2 text-neon-cyan font-bold uppercase text-sm tracking-widest group-hover:translate-x-2 transition-transform">
+                                        Ir a Entrenar <ChevronRight className="h-4 w-4" />
+                                    </span>
                                 </div>
                             </div>
-                        </div>
-                        <div className="absolute right-0 bottom-0 opacity-10">
-                            <Activity className="h-64 w-64 -mb-10 -mr-10 text-neon-cyan" />
-                        </div>
-                    </CrystalCard>
+                            <div className="absolute right-0 bottom-0 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <Activity className="h-64 w-64 -mb-10 -mr-10 text-white" />
+                            </div>
+                        </CrystalCard>
+                    </Link>
 
                     {/* QR Section */}
                     <div className="md:col-span-1">
