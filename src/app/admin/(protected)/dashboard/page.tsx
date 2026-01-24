@@ -3,11 +3,13 @@
 import { CrystalCard } from "@/components/crystal/CrystalCard";
 import { DollarSign, Users, UserPlus, TrendingUp, Loader2 } from "lucide-react";
 import { CrystalAreaChart } from "@/components/admin/CrystalAreaChart";
+import { TrainerDashboard } from "@/components/admin/TrainerDashboard";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
+    const [role, setRole] = useState<string | null>(null);
     const [stats, setStats] = useState({
         revenue: "$42,500",
         activeMembers: "342",
@@ -18,9 +20,20 @@ export default function AdminDashboardPage() {
     const supabase = createClient();
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchRoleAndStats = async () => {
             try {
-                // Count pending applications
+                // 1. Get Role
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { data: profile } = await supabase
+                        .from("profiles")
+                        .select("role")
+                        .eq("id", user.id)
+                        .single();
+                    setRole(profile?.role || "member");
+                }
+
+                // 2. Count pending applications (for Admins)
                 const { count, error } = await supabase
                     .from('membership_requests')
                     .select('*', { count: 'exact', head: true })
@@ -36,8 +49,14 @@ export default function AdminDashboardPage() {
             }
         };
 
-        fetchStats();
+        fetchRoleAndStats();
     }, []);
+
+    if (isLoading) return <div className="flex justify-center p-20"><Loader2 className="h-10 w-10 animate-spin text-neon-cyan" /></div>;
+
+    if (role === "trainer") {
+        return <TrainerDashboard />;
+    }
 
     const kpis = [
         { label: "Ingresos Mensuales", value: stats.revenue, trend: "+12%", icon: DollarSign, color: "neon-cyan" },

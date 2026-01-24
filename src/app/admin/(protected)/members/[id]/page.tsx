@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CrystalCard } from "@/components/crystal/CrystalCard";
 import { CrystalButton } from "@/components/crystal/CrystalButton";
-import { ArrowLeft, User, Calendar, Dumbbell, Trophy, Mail, Phone, Hash, Plus, X, Search, CheckCircle } from "lucide-react";
+import { ArrowLeft, User, Calendar, Dumbbell, Trophy, Mail, Phone, Hash, Plus, X, Search, CheckCircle, UserPlus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -17,14 +17,21 @@ export default function MemberDetailsPage() {
 
     const [member, setMember] = useState<any>(null);
     const [currentRoutine, setCurrentRoutine] = useState<any>(null);
+    const [currentTrainer, setCurrentTrainer] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isAssigning, setIsAssigning] = useState(false);
 
-    // Assignment Modal State
+    // Routine Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [availableRoutines, setAvailableRoutines] = useState<any[]>([]);
+
+    // Trainer Modal State
+    const [isTrainerModalOpen, setIsTrainerModalOpen] = useState(false);
+    const [availableTrainers, setAvailableTrainers] = useState<any[]>([]);
+
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedRoutine, setSelectedRoutine] = useState<string | null>(null);
+    const [selectedTrainer, setSelectedTrainer] = useState<string | null>(null);
 
     useEffect(() => {
         if (memberId) {
@@ -65,9 +72,26 @@ export default function MemberDetailsPage() {
                 setCurrentRoutine(null);
             }
 
+            // 3. Fetch Assigned Trainer
+            const { data: trainerAssig, error: trainerError } = await supabase
+                .from("trainer_assignments")
+                .select(`
+                    *,
+                    trainer:profiles!trainer_id (id, full_name, avatar_url)
+                `)
+                .eq("client_id", memberId)
+                .eq("status", "active")
+                .limit(1)
+                .single();
+
+            if (!trainerError && trainerAssig) {
+                setCurrentTrainer(trainerAssig);
+            } else {
+                setCurrentTrainer(null);
+            }
+
         } catch (err) {
             console.error("Error fetching details:", err);
-            // Handle error (redirect or show message)
         } finally {
             setIsLoading(false);
         }
@@ -81,9 +105,61 @@ export default function MemberDetailsPage() {
         setAvailableRoutines(data || []);
     };
 
+    const fetchAvailableTrainers = async () => {
+        const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("role", "trainer")
+            .order("full_name");
+        setAvailableTrainers(data || []);
+    };
+
     const handleOpenModal = () => {
         setIsModalOpen(true);
         fetchAvailableRoutines();
+    };
+
+    const handleOpenTrainerModal = () => {
+        setIsTrainerModalOpen(true);
+        fetchAvailableTrainers();
+    };
+
+    const handleAssignTrainer = async () => {
+        if (!selectedTrainer) return;
+        setIsAssigning(true);
+
+        try {
+            // 1. Deactivate current active trainer for this client if any
+            if (currentTrainer) {
+                await supabase
+                    .from("trainer_assignments")
+                    .update({ status: "archived" })
+                    .eq("client_id", memberId);
+            }
+
+            // 2. Create new assignment
+            const { error } = await supabase
+                .from("trainer_assignments")
+                .insert({
+                    trainer_id: selectedTrainer,
+                    client_id: memberId,
+                    status: "active",
+                    assigned_at: new Date().toISOString()
+                });
+
+            if (error) throw error;
+
+            await fetchMemberDetails();
+            setIsTrainerModalOpen(false);
+            setSelectedTrainer(null);
+            alert("Entrenador asignado correctamente");
+
+        } catch (err: any) {
+            console.error("Error trainer assignment:", err);
+            alert("Error al asignar entrenador");
+        } finally {
+            setIsAssigning(false);
+        }
     };
 
     const handleAssignRoutine = async () => {
@@ -262,9 +338,47 @@ export default function MemberDetailsPage() {
                         )}
                     </CrystalCard>
 
-                    {/* Progress Chart Placeholder */}
-                    <CrystalCard className="p-6 min-h-[250px] flex items-center justify-center" hoverEffect={false}>
-                        <p className="text-gray-600 uppercase font-black tracking-widest text-xs">Gráfico de Progreso (Próximamente)</p>
+                    {/* Trainer Assignment Card */}
+                    <CrystalCard className="p-8 relative min-h-[250px] flex flex-col" hoverEffect={false}>
+                        <div className="flex justify-between items-start mb-6">
+                            <div>
+                                <h3 className="text-sm font-black text-neon-cyan uppercase tracking-widest mb-1">Entrenador Personal</h3>
+                                <h2 className="text-2xl font-black text-white italic tracking-tight uppercase">
+                                    {currentTrainer ? currentTrainer.trainer.full_name : "Sin Entrenador"}
+                                </h2>
+                            </div>
+                            <CrystalButton
+                                onClick={handleOpenTrainerModal}
+                                className="text-xs px-6 py-2 bg-white/5 border-white/10"
+                                variant="secondary"
+                            >
+                                {currentTrainer ? "CAMBIAR" : "ASIGNAR"}
+                            </CrystalButton>
+                        </div>
+
+                        {currentTrainer ? (
+                            <div className="flex items-center gap-6 p-4 rounded-2xl bg-white/5 border border-white/5">
+                                <div className="h-16 w-16 rounded-xl bg-neon-cyan/20 flex items-center justify-center border border-neon-cyan/30 overflow-hidden shrink-0">
+                                    {currentTrainer.trainer.avatar_url ? (
+                                        <img src={currentTrainer.trainer.avatar_url} className="h-full w-full object-cover" />
+                                    ) : (
+                                        <User className="h-8 w-8 text-neon-cyan" />
+                                    )}
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-400 leading-relaxed font-medium">Este socio está bajo la supervisión técnica de {currentTrainer.trainer.full_name}.</p>
+                                    <div className="flex gap-2 mt-2">
+                                        <span className="text-[10px] font-black text-neon-cyan uppercase tracking-widest bg-neon-cyan/10 px-2 py-0.5 rounded">Verificado</span>
+                                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded">Status: Activo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex flex-col items-center justify-center text-center opacity-40 border-2 border-dashed border-white/10 rounded-2xl">
+                                <UserPlus className="h-10 w-10 text-gray-500 mb-2" />
+                                <p className="text-xs font-bold uppercase text-gray-500">No hay un entrenador asignado</p>
+                            </div>
+                        )}
                     </CrystalCard>
                 </div>
             </div>
@@ -304,8 +418,8 @@ export default function MemberDetailsPage() {
                                         key={routine.id}
                                         onClick={() => setSelectedRoutine(routine.id)}
                                         className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left ${selectedRoutine === routine.id
-                                                ? "bg-neon-cyan/10 border-neon-cyan/50 ring-1 ring-neon-cyan"
-                                                : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                                            ? "bg-neon-cyan/10 border-neon-cyan/50 ring-1 ring-neon-cyan"
+                                            : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                                             }`}
                                     >
                                         <div className="flex items-center gap-4">
@@ -344,6 +458,69 @@ export default function MemberDetailsPage() {
                                 className={`px-8 ${!selectedRoutine ? 'opacity-50 cursor-not-allowed' : 'shadow-[0_0_20px_rgba(0,243,255,0.2)]'}`}
                             >
                                 Confirmar Asignación
+                            </CrystalButton>
+                        </div>
+                    </CrystalCard>
+                </div>
+            )}
+            {/* Trainer Assignment Modal */}
+            {isTrainerModalOpen && (
+                <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+                    <CrystalCard className="w-full max-w-lg flex flex-col max-h-[80vh] p-0 overflow-hidden shadow-2xl border-white/10" hoverEffect={false}>
+                        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/40">
+                            <div>
+                                <h3 className="text-xl font-black text-white uppercase italic tracking-tight">Asignar Entrenador</h3>
+                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-0.5">Seleccionar staff técnico</p>
+                            </div>
+                            <button onClick={() => setIsTrainerModalOpen(false)} className="hover:text-red-400 text-gray-500 transition-colors">
+                                <X className="h-6 w-6" />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                            {availableTrainers.map(trainer => (
+                                <button
+                                    key={trainer.id}
+                                    onClick={() => setSelectedTrainer(trainer.id)}
+                                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left ${selectedTrainer === trainer.id
+                                        ? "bg-neon-cyan/10 border-neon-cyan/50 ring-1 ring-neon-cyan"
+                                        : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                                        }`}
+                                >
+                                    <div className="h-12 w-12 rounded-xl bg-black overflow-hidden border border-white/10 shrink-0">
+                                        {trainer.avatar_url ? (
+                                            <img src={trainer.avatar_url} className="h-full w-full object-cover" />
+                                        ) : (
+                                            <div className="h-full w-full flex items-center justify-center bg-gray-900">
+                                                <User className="h-5 w-5 text-gray-600" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className={`font-bold uppercase text-sm truncate ${selectedTrainer === trainer.id ? "text-neon-cyan" : "text-white"}`}>
+                                            {trainer.full_name}
+                                        </p>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widst">Personal Trainer</p>
+                                    </div>
+                                    {selectedTrainer === trainer.id && <CheckCircle className="h-5 w-5 text-neon-cyan" />}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="p-6 border-t border-white/10 bg-black/40 flex justify-end gap-3">
+                            <button
+                                onClick={() => setIsTrainerModalOpen(false)}
+                                className="px-6 py-3 rounded-xl text-gray-400 hover:text-white text-xs font-bold uppercase transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <CrystalButton
+                                onClick={handleAssignTrainer}
+                                isLoading={isAssigning}
+                                disabled={!selectedTrainer}
+                                className={`px-8 ${!selectedTrainer ? 'opacity-50 cursor-not-allowed' : 'shadow-[0_0_20px_rgba(0,243,255,0.2)]'}`}
+                            >
+                                Confirmar Entrenador
                             </CrystalButton>
                         </div>
                     </CrystalCard>

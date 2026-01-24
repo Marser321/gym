@@ -36,6 +36,15 @@ export default async function AdminLayout({
         redirect("/admin/login");
     }
 
+    // Fetch user profile to check role
+    const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user?.id)
+        .single();
+
+    const role = profile?.role || "member";
+
     // Fetch pending applications count
     let pendingCount = 0;
     try {
@@ -61,7 +70,7 @@ export default async function AdminLayout({
     return (
         <div className="flex min-h-screen bg-deep-charcoal">
             {/* Sidebar Desktop - Extracted to Client Component for interactivity */}
-            <AdminSidebar pendingCount={pendingCount} />
+            <AdminSidebar pendingCount={pendingCount} role={role} />
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
+export function AdminSidebar({ pendingCount = 0, role = "member" }: { pendingCount?: number, role?: string }) {
     const router = useRouter();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -19,17 +19,31 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
         router.refresh();
     };
 
-    const menuItems = [
-        { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
-        { icon: Users, label: "Socios", href: "/admin/members" },
-        { icon: UserCheck, label: "Entrenadores", href: "/admin/trainers" },
-        { icon: UserPlus, label: "Solicitudes", href: "/admin/applications" },
-        { icon: CreditCard, label: "Pagos", href: "/admin/finance" },
-        { icon: Dumbbell, label: "Servicios", href: "/admin/services" },
-        { icon: Dumbbell, label: "Ejercicios", href: "/admin/exercises" },
-        { icon: LayoutDashboard, label: "Rutinas", href: "/admin/routines" }, // Could use a different icon like Layers or Clipboard
-        { icon: Settings, label: "Configuración", href: "/admin/settings" },
+    const isAdmin = role === "admin";
+    const isTrainer = role === "trainer";
+
+    // Base items for everyone in the admin panel
+    const baseItems = [
+        { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard", roles: ["admin", "trainer"] },
     ];
+
+    const adminSpecificItems = [
+        { icon: Users, label: "Socios", href: "/admin/members", roles: ["admin"] },
+        { icon: UserCheck, label: "Entrenadores", href: "/admin/trainers", roles: ["admin"] },
+        { icon: UserPlus, label: "Solicitudes", href: "/admin/applications", roles: ["admin"] },
+        { icon: CreditCard, label: "Pagos", href: "/admin/finance", roles: ["admin"] },
+        { icon: Dumbbell, label: "Servicios", href: "/admin/services", roles: ["admin"] },
+        { icon: Dumbbell, label: "Ejercicios", href: "/admin/exercises", roles: ["admin", "trainer"] },
+        { icon: LayoutDashboard, label: "Rutinas", href: "/admin/routines", roles: ["admin", "trainer"] },
+        { icon: Settings, label: "Configuración", href: "/admin/settings", roles: ["admin"] },
+    ];
+
+    const trainerSpecificItems = [
+        { icon: Users, label: "Mis Clientes", href: "/admin/my-clients", roles: ["trainer"] },
+    ];
+
+    const allItems = [...baseItems, ...trainerSpecificItems, ...adminSpecificItems];
+    const menuItems = allItems.filter(item => item.roles.includes(role));
 
     return (
         <aside className="hidden w-64 flex-col border-r border-white/5 bg-black/40 backdrop-blur-xl md:flex">
