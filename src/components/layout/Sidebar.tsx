@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Home, Dumbbell, Users, User, QrCode, LogOut, Settings, Clock } from "lucide-react";
+import { Home, Dumbbell, Users, User, LogOut, Settings, Clock } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,6 @@ const navItems = [
     { href: "/dashboard/history", label: "Historial", icon: Clock },
     { href: "/dashboard/community", label: "Comunidad", icon: Users },
     { href: "/dashboard/profile", label: "Perfil", icon: User },
-    { href: "/dashboard/qr", label: "Acceso QR", icon: QrCode },
 ];
 
 export function Sidebar() {

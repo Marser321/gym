@@ -7,6 +7,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { promoteTrainerAction } from "@/app/actions/promote-trainer";
 
 export default function PromoteTrainerPage() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -41,16 +42,15 @@ export default function PromoteTrainerPage() {
 
         setIsUpdating(id);
         try {
-            const { error } = await supabase
-                .from("profiles")
-                .update({ role: "trainer" })
-                .eq("id", id);
+            const { success, error } = await promoteTrainerAction(id);
 
-            if (error) throw error;
+            if (!success) throw new Error(error);
+
             router.push("/admin/trainers");
-        } catch (err) {
+            router.refresh();
+        } catch (err: any) {
             console.error("Error promoting:", err);
-            alert("Error al promover al socio.");
+            alert(`Error al promover al socio: ${err.message || "Desconocido"}`);
         } finally {
             setIsUpdating(null);
         }

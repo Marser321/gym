@@ -43,7 +43,7 @@ export default async function AdminLayout({
         .eq("id", user?.id)
         .single();
 
-    const role = profile?.role || "member";
+    const role = profile?.role || "admin";
 
     // Fetch pending applications count
     let pendingCount = 0;

@@ -3,6 +3,7 @@
 import { Brain, Users, Activity, Zap, Trophy, Smartphone } from "lucide-react";
 import { FeatureCard } from "./FeatureCard";
 import { motion } from "framer-motion";
+import { ParallaxBackground } from "../ui/ParallaxBackground";
 
 const features = [
     {
@@ -39,12 +40,14 @@ const features = [
 
 export function FeaturesSection() {
     return (
-        <section className="relative py-24 bg-black">
-            {/* Background Gradients */}
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <section className="relative py-24 bg-black overflow-hidden">
+            <ParallaxBackground imageUrl="/features_background.png" opacity={0.3} />
 
-            <div className="container mx-auto px-4">
+            {/* Background Gradients */}
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent z-10" />
+            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent z-10" />
+
+            <div className="container mx-auto px-4 relative z-10">
                 <div className="mb-16 text-center max-w-3xl mx-auto">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}

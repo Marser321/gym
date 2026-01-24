@@ -8,8 +8,8 @@ export default function SettingsPage() {
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
             <div>
-                <h1 className="text-2xl font-bold text-white">Configuración</h1>
-                <p className="text-gray-400 text-sm">Preferencias generales y seguridad</p>
+                <h1 className="text-3xl font-black text-white tracking-tight uppercase italic">Configuración del Sistema</h1>
+                <p className="text-gray-400">Gestiona la configuración global de TAO CRM.</p>
             </div>
 
             {/* General Settings */}

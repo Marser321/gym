@@ -7,6 +7,8 @@ import { ArrowRight, Play, CheckCircle, X } from "lucide-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { useRef, useState } from "react";
+import { ParallaxBackground } from "@/components/ui/ParallaxBackground";
+import { AppTour } from "@/components/ui/AppTour";
 
 export default function Home() {
   const [showVideo, setShowVideo] = useState(false);
@@ -104,28 +106,30 @@ export default function Home() {
       {/* FEATURES */}
       <FeaturesSection />
 
+
       {/* CTA / PRICING TEASER */}
       <section className="relative py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-neon-cyan/10 to-transparent z-0 pointer-events-none" />
+        <ParallaxBackground imageUrl="/cta_background.png" opacity={0.5} />
+        <div className="absolute inset-0 bg-gradient-to-t from-neon-cyan/20 to-black/80 z-0 pointer-events-none" />
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-deep-charcoal to-black p-8 md:p-16 text-center relative overflow-hidden">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 md:p-16 text-center relative overflow-hidden backdrop-blur-sm">
             {/* Glow effect */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-neon-cyan/20 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-neon-cyan/10 blur-[120px] rounded-full pointer-events-none" />
 
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 relative z-10">
               ¿Listo para tu evolución?
             </h2>
-            <p className="text-gray-400 max-w-xl mx-auto mb-10 text-lg relative z-10">
+            <p className="text-gray-300 max-w-xl mx-auto mb-10 text-lg relative z-10 font-medium">
               Nexus AI te espera. Únete hoy para acceder a la planificación biométrica avanzada y elevar tu rendimiento al máximo nivel.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-6 relative z-10">
-              <div className="flex items-center gap-2 text-gray-300">
+              <div className="flex items-center gap-2 text-white">
                 <CheckCircle className="h-5 w-5 text-neon-cyan" />
                 <span>Entrenamiento Inteligente</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-300">
+              <div className="flex items-center gap-2 text-white">
                 <CheckCircle className="h-5 w-5 text-neon-cyan" />
                 <span>Resultados Medibles</span>
               </div>
@@ -133,7 +137,7 @@ export default function Home() {
 
             <div className="mt-10 relative z-10">
               <Link href="/signup">
-                <CrystalButton className="w-full sm:w-auto px-12">
+                <CrystalButton className="w-full sm:w-auto px-12 text-lg font-bold">
                   SOLICITAR MEMBRESÍA
                 </CrystalButton>
               </Link>
@@ -145,7 +149,7 @@ export default function Home() {
       {/* Footer Simple */}
       <footer className="border-t border-white/5 bg-black py-12 text-center">
         <p className="text-gray-600 text-sm">
-          © 2026 GYM PREMIUM FITNESS. Powered by <span className="text-neon-cyan">Nexus AI</span>.
+          © 2026 TAO GYM. Powered by <span className="text-neon-cyan">Nexus AI</span>.
         </p>
       </footer>
       {/* Video Modal */}
@@ -178,6 +182,9 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Product Tour Feature */}
+      <AppTour />
     </div>
   );
 }

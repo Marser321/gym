@@ -107,12 +107,20 @@ export default function SignUpPage() {
                     transition={{ duration: 0.6 }}
                     className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/60 p-8 shadow-2xl backdrop-blur-xl"
                 >
-                    <div className="mb-6 text-center">
-                        <UserPlus className="h-10 w-10 text-neon-cyan mx-auto mb-4" />
-                        <h1 className="text-3xl font-bold mb-2 tracking-tight uppercase italic">Postulación</h1>
-                        <p className="text-sm text-gray-400">Solicita tu acceso a la comunidad élite.</p>
+                    {/* Brand Header */}
+                    <div className="mb-6 flex flex-col items-center">
+                        <div
+                            className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-black border border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+                        >
+                            <img src="/tao-logo-original.jpg" alt="TAO Gym" className="h-14 w-14 object-contain" />
+                        </div>
+                        <h1 className="text-3xl font-black tracking-tighter text-white">
+                            TAO GYM
+                        </h1>
+                        <p className="mt-1 text-xs font-medium text-gray-400 tracking-widest uppercase">
+                            SOLICITUD DE MEMBRESÍA
+                        </p>
                     </div>
-
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {error && (
                             <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 text-center uppercase font-bold">

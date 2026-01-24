@@ -79,15 +79,16 @@ export default function LoginPage() {
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                                className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-tr from-neon-cyan/20 to-blue-600/20 border border-white/10 shadow-[0_0_30px_rgba(0,243,255,0.3)]"
+                                className="mb-6 flex h-24 w-24 items-center justify-center rounded-2xl bg-black border border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
                             >
-                                <Dumbbell className="h-10 w-10 text-neon-cyan drop-shadow-[0_0_10px_rgba(0,243,255,0.8)]" />
+                                {/* TAO Logo */}
+                                <img src="/tao-logo-original.jpg" alt="TAO Gym" className="h-16 w-16 object-contain" />
                             </motion.div>
-                            <h1 className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">
-                                GYM PREMIUM
+                            <h1 className="text-4xl font-black tracking-tighter text-white">
+                                TAO GYM
                             </h1>
-                            <p className="mt-2 text-sm font-medium text-neon-cyan/80 tracking-widest uppercase">
-                                Acceso Exclusivo
+                            <p className="mt-2 text-sm font-medium text-gray-400 tracking-widest uppercase">
+                                PUNTA DEL ESTE
                             </p>
                         </div>
 

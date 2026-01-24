@@ -10,8 +10,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Gym Premium | Fitness Excellence",
-  description: "Exclusive members-only fitness tracking application.",
+  title: "TAO GYM | Punta del Este",
+  description: "Centro de entrenamiento premium en Punta del Este. Pilates, Crossfit y Musculación.",
 };
 
 export default function RootLayout({

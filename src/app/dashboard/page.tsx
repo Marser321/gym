@@ -150,10 +150,10 @@ export default async function DashboardPage() {
 
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard title="Entrenamientos" value="18" icon={Dumbbell} trend="+3" trendUp />
-                    <StatCard title="Calorías" value="4.2k" icon={Activity} trend="12%" trendUp />
-                    <StatCard title="Tiempo" value="24h" icon={Clock} />
-                    <StatCard title="Rango" value={safeProfile.rank_name || "BRONCE"} icon={Trophy} />
+                    <StatCard title="Entrenamientos" value="18" icon={<Dumbbell className="h-4 w-4 text-neon-cyan" />} trend="+3" trendUp />
+                    <StatCard title="Calorías" value="4.2k" icon={<Activity className="h-4 w-4 text-neon-cyan" />} trend="12%" trendUp />
+                    <StatCard title="Tiempo" value="24h" icon={<Clock className="h-4 w-4 text-neon-cyan" />} />
+                    <StatCard title="Rango" value={safeProfile.rank_name || "BRONCE"} icon={<Trophy className="h-4 w-4 text-neon-cyan" />} />
                 </div>
 
                 {/* Actions */}

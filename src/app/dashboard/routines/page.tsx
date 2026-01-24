@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { RoutineCard } from "@/components/routines/RoutineCard";
 import { CrystalCard } from "@/components/crystal/CrystalCard";
 
+import Link from "next/link";
+
 export default async function RoutinesPage() {
     const supabase = await createClient();
 
@@ -76,10 +78,12 @@ export default async function RoutinesPage() {
                     </div>
                 )}
 
-                <CrystalCard className="flex flex-col items-center justify-center p-8 border-dashed border-white/20 bg-transparent hover:bg-white/5 cursor-pointer">
-                    <span className="text-4xl mb-2 text-gray-600">+</span>
-                    <span className="text-sm font-medium text-gray-400">Solicitar Nueva Rutina</span>
-                </CrystalCard>
+                <Link href="/dashboard/chat" className="h-full">
+                    <CrystalCard className="flex flex-col items-center justify-center p-8 border-dashed border-white/20 bg-transparent hover:bg-white/5 cursor-pointer h-full transition-all hover:border-neon-cyan/30">
+                        <span className="text-4xl mb-2 text-gray-600 group-hover:text-neon-cyan transition-colors">+</span>
+                        <span className="text-sm font-medium text-gray-400 group-hover:text-white transition-colors">Solicitar Nueva Rutina</span>
+                    </CrystalCard>
+                </Link>
             </div>
         </div>
     );

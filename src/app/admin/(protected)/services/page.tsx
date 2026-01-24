@@ -203,101 +203,163 @@ export default function ServicesPage() {
 
             {/* Modal para Crear/Editar */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl transition-all">
-                    <CrystalCard className="w-full max-w-2xl p-0 overflow-hidden border-white/20 shadow-[0_0_50px_rgba(0,0,0,0.8)]" hoverEffect={false}>
-                        <div className="p-8 space-y-8">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h2 className="text-2xl font-black text-white uppercase italic tracking-tight underline decoration-neon-cyan decoration-4 underline-offset-8">
-                                        {editingService ? 'Editar Servicio' : 'Nuevo Servicio'}
-                                    </h2>
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-4">Detalles de la sesión de entrenamiento</p>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all animate-in fade-in duration-200">
+                    <div className="absolute inset-0" onClick={() => setIsModalOpen(false)} />
+                    <CrystalCard className="w-full max-w-4xl p-0 overflow-hidden border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] relative z-10" hoverEffect={false}>
+                        <div className="grid grid-cols-1 lg:grid-cols-5 h-full">
+                            {/* Form Section */}
+                            <div className="lg:col-span-3 p-8 space-y-8 bg-black/40">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h2 className="text-2xl font-black text-white uppercase italic tracking-tight flex items-center gap-3">
+                                            {editingService ? (
+                                                <>
+                                                    <span className="text-neon-cyan text-4xl">/</span> EDITAR
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="text-neon-cyan text-4xl">+</span> NUEVA
+                                                </>
+                                            )}
+                                            CLASE
+                                        </h2>
+                                        <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1 ml-6">Gestión de identidad visual y agenda</p>
+                                    </div>
+                                    <button onClick={() => setIsModalOpen(false)} className="group p-2 text-gray-500 hover:text-white transition-colors">
+                                        <X className="h-6 w-6 group-hover:rotate-90 transition-transform" />
+                                    </button>
                                 </div>
-                                <button onClick={() => setIsModalOpen(false)} className="p-2 text-gray-400 hover:text-white transition-colors bg-white/5 rounded-full border border-white/10">
-                                    <X className="h-6 w-6" />
-                                </button>
-                            </div>
 
-                            <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Nombre de la Clase</label>
-                                        <input
-                                            required placeholder="Ej: CrossFit Élite"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-bold"
-                                            value={title} onChange={e => setTitle(e.target.value)}
-                                        />
+                                <form onSubmit={handleSave} className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Título</label>
+                                            <div className="relative group">
+                                                <Dumbbell className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600 group-focus-within:text-neon-cyan transition-colors" />
+                                                <input
+                                                    required placeholder="Ej: CrossFit Élite"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-bold placeholder:text-gray-700"
+                                                    value={title} onChange={e => setTitle(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Instructor</label>
+                                            <div className="relative group">
+                                                <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600 group-focus-within:text-neon-cyan transition-colors" />
+                                                <input
+                                                    required placeholder="Ej: Marcos V."
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-bold placeholder:text-gray-700"
+                                                    value={instructor} onChange={e => setInstructor(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Instructor</label>
-                                        <input
-                                            required placeholder="Ej: Marcos V."
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-bold"
-                                            value={instructor} onChange={e => setInstructor(e.target.value)}
-                                        />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Horario</label>
+                                            <div className="relative group">
+                                                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600 group-focus-within:text-neon-cyan transition-colors" />
+                                                <input
+                                                    required placeholder="07:00 AM - 08:00 AM"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-bold font-mono placeholder:text-gray-700"
+                                                    value={schedule} onChange={e => setSchedule(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Capacidad</label>
+                                            <div className="relative group">
+                                                <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600 group-focus-within:text-neon-cyan transition-colors" />
+                                                <input
+                                                    required placeholder="08/12 o 'Full'"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-bold placeholder:text-gray-700"
+                                                    value={capacity} onChange={e => setCapacity(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
+
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Imagen URL</label>
-                                        <div className="relative">
-                                            <Camera className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Imagen de Portada (URL)</label>
+                                        <div className="relative group">
+                                            <Camera className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600 group-focus-within:text-neon-cyan transition-colors" />
                                             <input
-                                                placeholder="https://images.unsplash..."
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 pl-12 text-sm text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-mono text-[10px]"
+                                                placeholder="https://..."
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-xs text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-mono placeholder:text-gray-700 text-ellipsis"
                                                 value={imageUrl} onChange={e => setImageUrl(e.target.value)}
                                             />
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Horario</label>
-                                        <input
-                                            required placeholder="07:00 AM - 08:00 AM"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-bold font-mono"
-                                            value={schedule} onChange={e => setSchedule(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Capacidad / Cupos</label>
-                                        <input
-                                            required placeholder="08/12 o 'Full'"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white outline-none focus:border-neon-cyan/50 focus:bg-white/10 transition-all font-bold"
-                                            value={capacity} onChange={e => setCapacity(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Estado del Servicio</label>
-                                        <div className="flex gap-4">
+                                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Estado</label>
+                                        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
                                             <button
                                                 type="button"
                                                 onClick={() => setStatus('active')}
-                                                className={`flex-1 py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${status === 'active' ? 'bg-green-500/20 border-green-500 text-green-400 shadow-[0_0_15px_rgba(74,222,128,0.2)]' : 'bg-white/5 border-white/10 text-gray-500'}`}
+                                                className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${status === 'active' ? 'bg-neon-cyan text-black shadow-lg shadow-neon-cyan/20' : 'text-gray-500 hover:text-white'}`}
                                             >
-                                                ACTIVA
+                                                Activa
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setStatus('cancelled')}
-                                                className={`flex-1 py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${status === 'cancelled' ? 'bg-red-500/20 border-red-500 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'bg-white/5 border-white/10 text-gray-500'}`}
+                                                className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${status === 'cancelled' ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'text-gray-500 hover:text-white'}`}
                                             >
-                                                CANCELADA
+                                                Inactiva
                                             </button>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="md:col-span-2 pt-4">
-                                    <CrystalButton
-                                        type="submit"
-                                        className="w-full h-14 font-black tracking-widest text-lg shadow-[0_0_30px_rgba(0,243,255,0.2)]"
-                                        isLoading={isSaving}
-                                    >
-                                        <Check className="h-6 w-6 mr-3" />
-                                        {editingService ? 'ACTUALIZAR SERVICIO' : 'CREAR SERVICIO'}
-                                    </CrystalButton>
+                                    <div className="pt-4">
+                                        <CrystalButton
+                                            type="submit"
+                                            className="w-full h-14 font-black tracking-widest text-lg shadow-[0_0_30px_rgba(0,243,255,0.15)] hover:shadow-[0_0_50px_rgba(0,243,255,0.3)] border-neon-cyan/30"
+                                            isLoading={isSaving}
+                                        >
+                                            {editingService ? 'GUARDAR CAMBIOS' : 'PUBLICAR CLASE'}
+                                        </CrystalButton>
+                                    </div>
+                                </form>
+                            </div>
+
+                            {/* Preview Section */}
+                            <div className="lg:col-span-2 relative hidden lg:block bg-black/60 border-l border-white/10">
+                                <div className="absolute inset-0 z-0">
+                                    <Image
+                                        src={imageUrl || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470'}
+                                        alt="Preview"
+                                        fill
+                                        className="object-cover opacity-30 grayscale hover:grayscale-0 transition-all duration-700"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                                 </div>
-                            </form>
+                                <div className="relative z-10 h-full flex flex-col justify-end p-8 space-y-4">
+                                    <div className="space-y-1">
+                                        <div className="inline-flex items-center px-2 py-1 rounded bg-neon-cyan/10 border border-neon-cyan/20 text-neon-cyan text-[10px] font-black uppercase tracking-widest mb-2">
+                                            Vista Previa
+                                        </div>
+                                        <h3 className="text-3xl font-black text-white italic uppercase tracking-tight leading-none">
+                                            {title || "Título de la clase"}
+                                        </h3>
+                                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                                            {instructor || "Nombre del Instructor"}
+                                        </p>
+                                    </div>
+                                    <div className="pt-6 border-t border-white/10 space-y-2">
+                                        <div className="flex items-center gap-3 text-sm text-gray-300">
+                                            <Clock className="h-4 w-4 text-neon-cyan" />
+                                            <span className="font-mono">{schedule || "00:00 AM - 00:00 PM"}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-sm text-gray-300">
+                                            <Users className="h-4 w-4 text-neon-cyan" />
+                                            <span>Cupos: {capacity || "00/00"}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </CrystalCard>
                 </div>

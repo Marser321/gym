@@ -85,13 +85,21 @@ export default function RoutinesPage() {
                                 {/* Header Image Placeholder for now */}
                                 <div className="relative h-48 bg-deep-charcoal border-b border-white/5 flex items-center justify-center overflow-hidden">
                                     {routine.image_url ? (
-                                        <Image src={routine.image_url} alt={routine.name} fill className="object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                                        <img
+                                            src={routine.image_url}
+                                            alt={routine.name}
+                                            className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = 'none';
+                                                e.currentTarget.parentElement?.classList.add('bg-gradient-to-br', 'from-gray-800', 'to-black');
+                                            }}
+                                        />
                                     ) : (
                                         <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black opacity-50" />
                                     )}
                                     <div className="relative z-10 flex flex-col items-center gap-2">
-                                        <Layers className="h-8 w-8 text-white/50 group-hover:text-neon-cyan transition-colors" />
-                                        <span className="text-xs font-black uppercase tracking-widest text-white/70">Protocolo</span>
+                                        <Layers className="h-8 w-8 text-neon-cyan drop-shadow-[0_0_8px_rgba(0,243,255,0.5)]" />
+                                        <span className="text-xs font-black uppercase tracking-widest text-white text-glow">Protocolo</span>
                                     </div>
                                 </div>
 

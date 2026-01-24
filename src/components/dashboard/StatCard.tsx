@@ -1,25 +1,25 @@
 "use client";
 
-import { LucideIcon } from "lucide-react";
+import { ReactNode } from "react";
 import { CrystalCard } from "../crystal/CrystalCard";
 import { cn } from "@/lib/utils";
 
 interface StatCardProps {
     title: string;
     value: string | number;
-    icon: LucideIcon;
+    icon: ReactNode;
     trend?: string;
     trendUp?: boolean;
     className?: string;
 }
 
-export function StatCard({ title, value, icon: Icon, trend, trendUp, className }: StatCardProps) {
+export function StatCard({ title, value, icon, trend, trendUp, className }: StatCardProps) {
     return (
         <CrystalCard className={cn("flex flex-col gap-1", className)} hoverEffect>
             <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-gray-400">{title}</p>
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 border border-white/10">
-                    <Icon className="h-4 w-4 text-neon-cyan" />
+                    {icon}
                 </div>
             </div>
 

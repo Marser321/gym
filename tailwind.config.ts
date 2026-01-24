@@ -56,12 +56,13 @@ const config: Config = {
 					'5': 'hsl(var(--chart-5))'
 				},
 				// Custom Gym Colors
-				'deep-charcoal': '#0F1115',
-				'midnight-blue': '#0a0e17',
-				'neon-cyan': '#00f3ff',
-				'neon-purple': '#bc13fe',
-				'glass-border': 'rgba(255, 255, 255, 0.1)',
-				'glass-bg': 'rgba(15, 17, 21, 0.6)',
+				// TAO Gym Custom Colors (Monochromatic Premium)
+				'deep-charcoal': '#050505', // Darker black
+				'midnight-blue': '#0a0a0a', // Almost black
+				'neon-cyan': '#ffffff',     // Primary Brand White
+				'neon-purple': '#c0c0c0',   // Secondary Silver/Grey
+				'glass-border': 'rgba(255, 255, 255, 0.15)',
+				'glass-bg': 'rgba(20, 20, 20, 0.7)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

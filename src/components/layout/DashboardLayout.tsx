@@ -1,6 +1,7 @@
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
 import { ReactNode } from "react";
+import { AppTour } from "../ui/AppTour";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
     return (
@@ -20,6 +21,9 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
 
             {/* Mobile Navigation */}
             <MobileNav />
+
+            {/* Application Tour & Help */}
+            <AppTour />
         </div>
     );
 }

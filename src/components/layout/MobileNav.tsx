@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Home, Dumbbell, Users, User, QrCode, Clock } from "lucide-react";
+import { Home, Dumbbell, Users, User, Clock } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 const navItems = [
     { href: "/dashboard", label: "Inicio", icon: Home },
     { href: "/dashboard/routines", label: "Rutinas", icon: Dumbbell },
-    { href: "/dashboard/qr", label: "Acceso", icon: QrCode, isFab: true },
     { href: "/dashboard/history", label: "Historial", icon: Clock },
     { href: "/dashboard/profile", label: "Perfil", icon: User },
 ];
@@ -24,19 +23,7 @@ export function MobileNav() {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
 
-                    if (item.isFab) {
-                        return (
-                            <Link key={item.href} href={item.href}>
-                                <motion.div
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    className="relative -top-8 flex h-14 w-14 items-center justify-center rounded-full bg-neon-cyan text-black shadow-[0_0_20px_rgba(0,243,255,0.4)] border border-white/20"
-                                >
-                                    <Icon className="h-6 w-6" />
-                                </motion.div>
-                            </Link>
-                        );
-                    }
+
 
                     return (
                         <Link key={item.href} href={item.href} className="relative flex flex-col items-center justify-center p-2">
