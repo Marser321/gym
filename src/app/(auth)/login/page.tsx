@@ -153,18 +153,22 @@ export default function LoginPage() {
                             </button>
                         </form>
 
-                        <div className="relative z-[50] mt-8 flex flex-col items-center gap-4 text-xs pointer-events-auto">
+                        <div className="relative z-[100] mt-8 flex flex-col items-center gap-4 text-xs pointer-events-auto">
                             <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">¿No tienes cuenta?</p>
-                            <Link
-                                href="/signup"
-                                className="w-full py-3.5 rounded-xl border border-neon-cyan/50 text-neon-cyan font-bold uppercase tracking-widest text-center transition-all hover:bg-neon-cyan hover:text-black hover:shadow-[0_0_25px_rgba(0,243,255,0.4)] bg-transparent active:scale-[0.98]"
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    console.log("Navigating to signup (v2)");
+                                    router.push("/signup");
+                                }}
+                                className="w-full py-4 rounded-xl border border-neon-cyan/50 text-neon-cyan font-bold uppercase tracking-widest text-center transition-all hover:bg-neon-cyan hover:text-black hover:shadow-[0_0_30px_rgba(0,243,255,0.5)] bg-transparent active:scale-[0.98] cursor-pointer"
                             >
                                 SOLICITAR MEMBRESÍA
-                            </Link>
+                            </button>
 
                             <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent my-2" />
 
-                            <Link href="/admin" className="flex items-center gap-1 text-gray-500 hover:text-white transition-all p-2">
+                            <Link href="/admin" className="flex items-center gap-1 text-gray-500 hover:text-white transition-all p-2 relative z-[100]">
                                 <Lock className="h-3 w-3" /> Acceso Staff
                             </Link>
                         </div>
