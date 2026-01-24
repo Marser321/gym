@@ -4,7 +4,14 @@ import { motion } from "framer-motion";
 import { UserPlus, Mail, Dumbbell, ArrowRight, Loader2, User, Phone, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createBrowserClient } from '@supabase/ssr'
+
+function createClient() {
+    return createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+}
 import Link from "next/link";
 
 export default function SignUpPage() {
