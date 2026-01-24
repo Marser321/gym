@@ -68,4 +68,22 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='xp') THEN
         ALTER TABLE public.profiles ADD COLUMN xp int default 0;
     END IF;
+    -- Add role column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='role') THEN
+        ALTER TABLE public.profiles ADD COLUMN role text default 'member'; -- member, trainer, admin
+    END IF;
 END $$;
+
+-- 11. TABLA: TRAINER_ASSIGNMENTS (Relación Entrenador-Cliente)
+create table if not exists public.trainer_assignments (
+  id uuid default gen_random_uuid() primary key,
+  trainer_id uuid references public.profiles(id) on delete cascade,
+  client_id uuid references public.profiles(id) on delete cascade,
+  assigned_at timestamptz default now(),
+  status text default 'active',
+  unique(trainer_id, client_id)
+);
+alter table public.trainer_assignments enable row level security;
+create policy "Public read assignments" on public.trainer_assignments for select using (true);
+create policy "Staff manage assignments" on public.trainer_assignments for all using (true) with check (true);
+

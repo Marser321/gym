@@ -51,12 +51,27 @@ export default async function DashboardPage() {
 
         return (
             <div className="space-y-8 pb-24">
-                {/* Header */}
-                <div>
-                    <h1 className="text-4xl font-black text-white tracking-tight italic uppercase">
-                        BIENVENIDO, <span className="text-neon-cyan text-glow">{safeProfile.full_name?.split(' ')[0] || 'ATLETA'}</span>
-                    </h1>
-                    <p className="text-gray-500 font-medium tracking-widest uppercase text-xs mt-1">Estatus: Premium • Nivel {safeProfile.level || 1}</p>
+                {/* Header with XP Progress */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div>
+                        <h1 className="text-4xl font-black text-white tracking-tight italic uppercase">
+                            BIENVENIDO, <span className="text-neon-cyan text-glow">{safeProfile.full_name?.split(' ')[0] || 'ATLETA'}</span>
+                        </h1>
+                        <p className="text-gray-500 font-medium tracking-widest uppercase text-xs mt-1">Estatus: Premium • Nivel {safeProfile.level || 1}</p>
+                    </div>
+
+                    <div className="flex-1 max-w-md w-full">
+                        <div className="flex justify-between items-end mb-2">
+                            <span className="text-[10px] font-black text-neon-cyan uppercase tracking-widest">Progreso de Nivel</span>
+                            <span className="text-[10px] font-black text-white uppercase tracking-widest">{(safeProfile.xp || 0) % 1000} / 1000 XP</span>
+                        </div>
+                        <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
+                            <div
+                                className="h-full bg-gradient-to-r from-neon-cyan to-blue-500 rounded-full shadow-[0_0_10px_rgba(0,243,255,0.5)] transition-all duration-1000"
+                                style={{ width: `${((safeProfile.xp || 0) % 1000) / 10}%` }}
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Main Grid */}
