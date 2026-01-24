@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { CrystalButton } from "@/components/crystal/CrystalButton";
 import { ArrowRight, Play, CheckCircle, X } from "lucide-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
@@ -28,8 +29,13 @@ export default function Home() {
           className="absolute inset-0 z-0"
         >
           <div className="absolute inset-0 bg-deep-charcoal/70 backdrop-blur-[2px] z-10" />
-          <div
-            className="h-full w-full bg-[url('https://images.unsplash.com/photo-1540497077202-7c8a33801f0a?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center"
+          <Image
+            src="https://images.unsplash.com/photo-1540497077202-7c8a33801f0a?q=80&w=2670&auto=format&fit=crop"
+            alt="Gym Background"
+            fill
+            priority
+            className="object-cover object-center"
+            quality={90}
           />
         </motion.div>
 
@@ -162,7 +168,7 @@ export default function Home() {
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+                src="https://www.youtube.com/embed/p9zCADx_g4w?autoplay=1"
                 title="Gym Premium Showreel"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
