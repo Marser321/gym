@@ -1,10 +1,9 @@
 -- ================================================================
--- GYM PREMIUM - UPDATE SCRIPT
+-- GYM PREMIUM - UPDATE SCRIPT (Version Robusta / Idempotente)
 -- Ejecutar este script para habilitar Historial, XP y Gamificación.
 -- ================================================================
 
--- 1. TABLAS NUEVAS (Si no existen)
-
+-- 1. TABLAS NUEVAS
 -- Tabla Exercises
 create table if not exists public.exercises (
   id uuid default gen_random_uuid() primary key,
@@ -14,7 +13,11 @@ create table if not exists public.exercises (
   created_at timestamptz default now()
 );
 alter table public.exercises enable row level security;
+
+-- Limpiar y recrear políticas para exercises
+drop policy if exists "Public read exercises" on public.exercises;
 create policy "Public read exercises" on public.exercises for select using (true);
+drop policy if exists "Staff manage exercises" on public.exercises;
 create policy "Staff manage exercises" on public.exercises for all using (true) with check (true);
 
 -- Tabla Routine Exercises
@@ -29,7 +32,11 @@ create table if not exists public.routine_exercises (
   created_at timestamptz default now()
 );
 alter table public.routine_exercises enable row level security;
+
+-- Limpiar y recrear políticas para routine_exercises
+drop policy if exists "Public read routine exercises" on public.routine_exercises;
 create policy "Public read routine exercises" on public.routine_exercises for select using (true);
+drop policy if exists "Staff manage routine exercises" on public.routine_exercises;
 create policy "Staff manage routine exercises" on public.routine_exercises for all using (true) with check (true);
 
 -- Tabla User Routines (Asignaciones)
@@ -42,7 +49,11 @@ create table if not exists public.user_routines (
   completed_at timestamptz
 );
 alter table public.user_routines enable row level security;
+
+-- Limpiar y recrear políticas para user_routines
+drop policy if exists "Users read own routines" on public.user_routines;
 create policy "Users read own routines" on public.user_routines for select using (auth.uid() = user_id);
+drop policy if exists "Staff manage user routines" on public.user_routines;
 create policy "Staff manage user routines" on public.user_routines for all using (true) with check (true);
 
 -- Tabla Workout Logs (Historial)
@@ -57,24 +68,26 @@ create table if not exists public.workout_logs (
   completed_at timestamptz default now()
 );
 alter table public.workout_logs enable row level security;
+
+-- Limpiar y recrear políticas para workout_logs
+drop policy if exists "Users read own logs" on public.workout_logs;
 create policy "Users read own logs" on public.workout_logs for select using (auth.uid() = user_id);
+drop policy if exists "Users insert own logs" on public.workout_logs;
 create policy "Users insert own logs" on public.workout_logs for insert with check (auth.uid() = user_id);
 
 
--- 2. GAMIFICACIÓN (Columnas XP en Profiles)
-
+-- 2. GAMIFICACIÓN (Columnas XP y Role en Profiles)
 DO $$ 
 BEGIN 
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='xp') THEN
         ALTER TABLE public.profiles ADD COLUMN xp int default 0;
     END IF;
-    -- Add role column
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='role') THEN
-        ALTER TABLE public.profiles ADD COLUMN role text default 'member'; -- member, trainer, admin
+        ALTER TABLE public.profiles ADD COLUMN role text default 'member';
     END IF;
 END $$;
 
--- 11. TABLA: TRAINER_ASSIGNMENTS (Relación Entrenador-Cliente)
+-- 3. TABLA: TRAINER_ASSIGNMENTS (Relación Entrenador-Cliente)
 create table if not exists public.trainer_assignments (
   id uuid default gen_random_uuid() primary key,
   trainer_id uuid references public.profiles(id) on delete cascade,
@@ -84,6 +97,9 @@ create table if not exists public.trainer_assignments (
   unique(trainer_id, client_id)
 );
 alter table public.trainer_assignments enable row level security;
-create policy "Public read assignments" on public.trainer_assignments for select using (true);
-create policy "Staff manage assignments" on public.trainer_assignments for all using (true) with check (true);
 
+-- Limpiar y recrear políticas para trainer_assignments
+drop policy if exists "Public read assignments" on public.trainer_assignments;
+create policy "Public read assignments" on public.trainer_assignments for select using (true);
+drop policy if exists "Staff manage assignments" on public.trainer_assignments;
+create policy "Staff manage assignments" on public.trainer_assignments for all using (true) with check (true);
