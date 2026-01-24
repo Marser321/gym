@@ -114,20 +114,20 @@ export default function Home() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-neon-cyan/20 blur-[120px] rounded-full pointer-events-none" />
 
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 relative z-10">
-              ¿Listo para el cambio?
+              ¿Listo para tu evolución?
             </h2>
             <p className="text-gray-400 max-w-xl mx-auto mb-10 text-lg relative z-10">
-              La primera calibración con Nexus AI es gratuita. Descubre tu nivel real y recibe un plan de 7 días sin costo.
+              Nexus AI te espera. Únete hoy para acceder a la planificación biométrica avanzada y elevar tu rendimiento al máximo nivel.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-6 relative z-10">
               <div className="flex items-center gap-2 text-gray-300">
-                <CheckCircle className="h-5 w-5 text-green-400" />
-                <span>Sin tarjeta de crédito</span>
+                <CheckCircle className="h-5 w-5 text-neon-cyan" />
+                <span>Entrenamiento Inteligente</span>
               </div>
               <div className="flex items-center gap-2 text-gray-300">
-                <CheckCircle className="h-5 w-5 text-green-400" />
-                <span>Cancelación inmediata</span>
+                <CheckCircle className="h-5 w-5 text-neon-cyan" />
+                <span>Resultados Medibles</span>
               </div>
             </div>
 
