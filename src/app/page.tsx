@@ -30,7 +30,7 @@ export default function Home() {
         >
           <div className="absolute inset-0 bg-deep-charcoal/70 backdrop-blur-[2px] z-10" />
           <Image
-            src="https://images.unsplash.com/photo-1540497077202-7c8a33801f0a?q=80&w=2670&auto=format&fit=crop"
+            src="/gym-background-dark.png"
             alt="Gym Background"
             fill
             priority
