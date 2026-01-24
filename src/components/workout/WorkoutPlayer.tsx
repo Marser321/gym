@@ -123,7 +123,7 @@ export function WorkoutPlayer({ routine, exercises, userId }: WorkoutPlayerProps
         setIsResting(false);
     };
 
-    const finishWorkout = () => {
+    const finishWorkout = async () => {
         setIsFinished(true);
         confetti({
             particleCount: 100,
@@ -131,6 +131,31 @@ export function WorkoutPlayer({ routine, exercises, userId }: WorkoutPlayerProps
             origin: { y: 0.6 },
             colors: ['#00F3FF', '#FFFFFF']
         });
+
+        // Award XP logic
+        try {
+            const { data: profile } = await supabase
+                .from("profiles")
+                .select("xp")
+                .eq("id", userId)
+                .single();
+
+            const currentXP = profile?.xp || 0;
+            const newXP = currentXP + 250;
+            const newLevel = Math.floor(newXP / 1000) + 1;
+
+            await supabase
+                .from("profiles")
+                .update({
+                    xp: newXP,
+                    level: newLevel,
+                    updated_at: new Date().toISOString()
+                })
+                .eq("id", userId);
+
+        } catch (error) {
+            console.error("Error awarding XP:", error);
+        }
     };
 
     // -- Render: Finished State --

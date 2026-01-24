@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Home, Dumbbell, Users, User, QrCode } from "lucide-react";
+import { Home, Dumbbell, Users, User, QrCode, Clock } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,7 @@ const navItems = [
     { href: "/dashboard", label: "Inicio", icon: Home },
     { href: "/dashboard/routines", label: "Rutinas", icon: Dumbbell },
     { href: "/dashboard/qr", label: "Acceso", icon: QrCode, isFab: true },
-    { href: "/dashboard/community", label: "Buzz", icon: Users },
+    { href: "/dashboard/history", label: "Historial", icon: Clock },
     { href: "/dashboard/profile", label: "Perfil", icon: User },
 ];
 
