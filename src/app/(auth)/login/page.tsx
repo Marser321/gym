@@ -161,7 +161,8 @@ export default function LoginPage() {
                                     console.log("Navigating to signup (v2)");
                                     router.push("/signup");
                                 }}
-                                className="w-full py-4 rounded-xl border border-neon-cyan/50 text-neon-cyan font-bold uppercase tracking-widest text-center transition-all hover:bg-neon-cyan hover:text-black hover:shadow-[0_0_30px_rgba(0,243,255,0.5)] bg-transparent active:scale-[0.98] cursor-pointer"
+                                /* BUILD_VERSION: 1.0.8 */
+                                className="w-full py-5 rounded-xl border border-neon-cyan/50 text-neon-cyan font-bold uppercase tracking-widest text-center transition-all hover:bg-neon-cyan hover:text-black hover:shadow-[0_0_40px_rgba(0,243,255,0.6)] bg-transparent active:scale-[0.98] cursor-pointer relative z-[200]"
                             >
                                 SOLICITAR MEMBRESÍA
                             </button>
