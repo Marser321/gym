@@ -132,9 +132,9 @@ export default function Home() {
             </div>
 
             <div className="mt-10 relative z-10">
-              <Link href="/login">
+              <Link href="/signup">
                 <CrystalButton className="w-full sm:w-auto px-12">
-                  CREAR CUENTA GRATIS
+                  SOLICITAR MEMBRESÍA
                 </CrystalButton>
               </Link>
             </div>
