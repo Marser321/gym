@@ -5,7 +5,12 @@ import { useEffect, useState } from "react";
 // En un caso real usaríamos una librería como 'qrcode.react', 
 // aquí simularemos el QR visualmente para la demo estética o usaremos un placeholder SVG.
 // Para ser funcionales instalaremos qrcode.react luego si el usuario confirma.
-import { QRCodeSVG } from "qrcode.react"; // Necesitaremos instalar esto: npm i qrcode.react
+import dynamic from "next/dynamic";
+
+const QRCodeSVG = dynamic(
+    () => import("qrcode.react").then((mod) => mod.QRCodeSVG),
+    { ssr: false }
+);
 
 interface QRCrystalProps {
     token: string;

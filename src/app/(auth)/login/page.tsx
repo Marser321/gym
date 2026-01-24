@@ -52,7 +52,7 @@ export default function LoginPage() {
                     initial={{ scale: 1 }}
                     animate={{ scale: 1.1 }}
                     transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-                    className="h-full w-full bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop')] bg-cover bg-center opacity-60"
+                    className="h-full w-full bg-[url('/gym-background-dark.png')] bg-cover bg-center opacity-60"
                 />
             </div>
 
