@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CrystalCard } from "@/components/crystal/CrystalCard";
 import { CrystalButton } from "@/components/crystal/CrystalButton";
-import { ArrowLeft, Save, Plus, Trash2, GripVertical, Check, Search, Dumbbell } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, GripVertical, Check, Search, Dumbbell, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
 import Link from "next/link";
