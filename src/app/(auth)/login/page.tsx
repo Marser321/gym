@@ -154,10 +154,15 @@ export default function LoginPage() {
                         </form>
 
                         <div className="relative z-50 mt-8 flex flex-col items-center gap-4 text-xs text-gray-500 pointer-events-auto">
-                            <Link href="/signup" className="hover:text-neon-cyan transition-colors p-2">
-                                ¿No tienes cuenta? <span className="font-bold text-white underline decoration-neon-cyan/50 underline-offset-4">Solicitar Membresía</span>
+                            <p>¿No tienes cuenta?</p>
+                            <Link href="/signup" className="w-full">
+                                <button type="button" className="w-full py-3 rounded-xl border border-neon-cyan/50 text-neon-cyan font-bold uppercase tracking-widest hover:bg-neon-cyan hover:text-black transition-all shadow-[0_0_15px_rgba(0,243,255,0.2)]">
+                                    Solicitar Membresía
+                                </button>
                             </Link>
-                            <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                            <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent my-2" />
+
                             <Link href="/admin" className="flex items-center gap-1 opacity-50 hover:opacity-100 transition-opacity p-2">
                                 <Lock className="h-3 w-3" /> Acceso Staff
                             </Link>
