@@ -153,12 +153,12 @@ export default function LoginPage() {
                             </button>
                         </form>
 
-                        <div className="relative z-10 mt-8 flex flex-col items-center gap-4 text-xs text-gray-500">
-                            <Link href="/signup" className="hover:text-neon-cyan transition-colors">
-                                ¿No tienes cuenta? <span className="font-bold text-white">Solicitar Membresía</span>
+                        <div className="relative z-50 mt-8 flex flex-col items-center gap-4 text-xs text-gray-500 pointer-events-auto">
+                            <Link href="/signup" className="hover:text-neon-cyan transition-colors p-2">
+                                ¿No tienes cuenta? <span className="font-bold text-white underline decoration-neon-cyan/50 underline-offset-4">Solicitar Membresía</span>
                             </Link>
                             <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                            <Link href="/admin" className="flex items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                            <Link href="/admin" className="flex items-center gap-1 opacity-50 hover:opacity-100 transition-opacity p-2">
                                 <Lock className="h-3 w-3" /> Acceso Staff
                             </Link>
                         </div>
