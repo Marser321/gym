@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Users, CreditCard, Dumbbell, Settings, LogOut, UserPlus } from "lucide-react";
+import { LayoutDashboard, Users, CreditCard, Dumbbell, Settings, LogOut, UserPlus, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -22,6 +22,7 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
         { icon: Users, label: "Socios", href: "/admin/members" },
+        { icon: UserCheck, label: "Entrenadores", href: "/admin/trainers" },
         { icon: UserPlus, label: "Solicitudes", href: "/admin/applications" },
         { icon: CreditCard, label: "Pagos", href: "/admin/finance" },
         { icon: Dumbbell, label: "Servicios", href: "/admin/services" },
