@@ -25,7 +25,8 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
         { icon: UserPlus, label: "Solicitudes", href: "/admin/applications" },
         { icon: CreditCard, label: "Pagos", href: "/admin/finance" },
         { icon: Dumbbell, label: "Servicios", href: "/admin/services" },
-        { icon: Dumbbell, label: "Ejercicios", href: "/admin/exercises" }, // Using same icon for now or we could import a new one
+        { icon: Dumbbell, label: "Ejercicios", href: "/admin/exercises" },
+        { icon: LayoutDashboard, label: "Rutinas", href: "/admin/routines" }, // Could use a different icon like Layers or Clipboard
         { icon: Settings, label: "Configuración", href: "/admin/settings" },
     ];
 
