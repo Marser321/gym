@@ -108,49 +108,52 @@ export default function MembersPage() {
                     </CrystalCard>
                 ) : (
                     filteredMembers.map((member) => (
-                        <CrystalCard key={member.id} className="p-4 hover:bg-white/5 transition-all flex flex-col md:flex-row items-center gap-4 group" hoverEffect={false}>
-                            {/* Avatar & Info */}
-                            <div className="flex items-center gap-4 flex-1 w-full">
-                                <div className="relative h-14 w-14 rounded-full overflow-hidden border border-white/10 p-1">
-                                    <div className="h-full w-full rounded-full bg-deep-charcoal flex items-center justify-center overflow-hidden">
-                                        {member.avatar_url ? (
-                                            <img src={member.avatar_url} alt={member.full_name} className="h-full w-full object-cover" />
-                                        ) : (
-                                            <User className="h-6 w-6 text-gray-600" />
-                                        )}
+                        <Link href={`/admin/members/${member.id}`} key={member.id} className="block group">
+                            <CrystalCard className="p-4 hover:bg-white/5 transition-all flex flex-col md:flex-row items-center gap-4" hoverEffect={false}>
+                                {/* Avatar & Info */}
+                                <div className="flex items-center gap-4 flex-1 w-full">
+                                    <div className="relative h-14 w-14 rounded-full overflow-hidden border border-white/10 p-1">
+                                        <div className="h-full w-full rounded-full bg-deep-charcoal flex items-center justify-center overflow-hidden">
+                                            {member.avatar_url ? (
+                                                <img src={member.avatar_url} alt={member.full_name} className="h-full w-full object-cover" />
+                                            ) : (
+                                                <User className="h-6 w-6 text-gray-600" />
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-0.5">
+                                        <h3 className="font-bold text-white uppercase tracking-tight group-hover:text-neon-cyan transition-colors">{member.full_name || 'Sin Nombre'}</h3>
+                                        <div className="text-[10px] font-mono text-neon-cyan/70 tracking-tighter uppercase whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">
+                                            ID: {member.id}
+                                        </div>
+                                        <div className="text-xs text-gray-500 font-medium">Nivel {member.level || 1} • {member.rank_name || 'Bronce'}</div>
                                     </div>
                                 </div>
-                                <div className="space-y-0.5">
-                                    <h3 className="font-bold text-white uppercase tracking-tight">{member.full_name || 'Sin Nombre'}</h3>
-                                    <div className="text-[10px] font-mono text-neon-cyan/70 tracking-tighter uppercase whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">
-                                        ID: {member.id}
-                                    </div>
-                                    <div className="text-xs text-gray-500 font-medium">Nivel {member.level || 1} • {member.rank_name || 'Bronce'}</div>
+
+                                {/* Status Badge */}
+                                <div className="flex flex-1 items-center gap-2 w-full md:w-auto justify-center md:justify-start">
+                                    <span className="flex items-center gap-1 px-4 py-1.5 rounded-full bg-green-500/10 text-green-400 text-[10px] font-black border border-green-500/20 uppercase tracking-widest">
+                                        <CheckCircle className="h-3 w-3" /> ACTIVO
+                                    </span>
                                 </div>
-                            </div>
 
-                            {/* Status Badge */}
-                            <div className="flex flex-1 items-center gap-2 w-full md:w-auto justify-center md:justify-start">
-                                <span className="flex items-center gap-1 px-4 py-1.5 rounded-full bg-green-500/10 text-green-400 text-[10px] font-black border border-green-500/20 uppercase tracking-widest">
-                                    <CheckCircle className="h-3 w-3" /> ACTIVO
-                                </span>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="flex items-center gap-2 justify-end w-full md:w-auto">
-                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {/* Actions */}
+                                <div className="flex items-center gap-2 justify-end w-full md:w-auto">
                                     <button
-                                        onClick={() => handleDelete(member.id)}
-                                        className="p-3 text-red-500/60 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+                                        onClick={(e) => {
+                                            e.preventDefault(); // Prevent navigation
+                                            handleDelete(member.id);
+                                        }}
+                                        className="p-3 text-red-500/60 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all relative z-10"
                                     >
                                         <Trash2 className="h-5 w-5" />
                                     </button>
-                                    <button className="p-3 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                                    <div className="p-3 text-gray-400 group-hover:text-white rounded-xl transition-all">
                                         <MoreVertical className="h-5 w-5" />
-                                    </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </CrystalCard>
+                            </CrystalCard>
+                        </Link>
                     ))
                 )}
             </div>
