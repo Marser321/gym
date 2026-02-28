@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidateTag } from 'next/cache'
+import { withGuard, withPermission } from '@/lib/rbac'
 import type { ClassSession } from '@/types/database'
 
 // ─── Obtener sesiones de clase por rango de fechas ──────────────────────────
@@ -12,10 +13,12 @@ export async function getClassSessions(params: {
   trainerId?: string
   status?: string
 }) {
-  const supabase = await createClient()
-  if (!supabase) return { data: null, error: 'No se pudo conectar con Supabase' }
+  // Cualquier miembro autenticado del gym puede ver sesiones
+  return withGuard('member', async () => {
+    const supabase = await createClient()
+    if (!supabase) return { data: null, error: 'No se pudo conectar con Supabase' }
 
-  let query = supabase
+    let query = supabase
     .from('class_sessions')
     .select(`
       *,
@@ -45,6 +48,7 @@ export async function getClassSessions(params: {
   }
 
   return { data, error: null }
+  }) // cierra withGuard
 }
 
 // ─── Crear una sesión de clase ──────────────────────────────────────────────
@@ -58,14 +62,10 @@ export async function createClassSession(session: {
   end_at: string
   capacity?: number
 }) {
-  const supabase = await createClient()
-  if (!supabase) return { data: null, error: 'No se pudo conectar con Supabase' }
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { data: null, error: 'No autenticado' }
-
-  const gymId = user.app_metadata?.gym_id
-  if (!gymId) return { data: null, error: 'No se encontró gym_id en el usuario' }
+  // Solo admin puede crear sesiones
+  return withPermission('class_sessions', 'create', async ({ gymId }) => {
+    const supabase = await createClient()
+    if (!supabase) return { data: null, error: 'No se pudo conectar con Supabase' }
 
   const { data, error } = await supabase
     .from('class_sessions')
@@ -102,6 +102,7 @@ export async function createClassSession(session: {
   revalidateTag('class-sessions', 'max')
 
   return { data, error: null }
+  }) // cierra withPermission para createClassSession
 }
 
 // ─── Actualizar una sesión de clase ─────────────────────────────────────────
@@ -110,35 +111,31 @@ export async function updateClassSession(
   sessionId: string,
   updates: Partial<Pick<ClassSession, 'trainer_id' | 'room' | 'start_at' | 'end_at' | 'capacity' | 'status' | 'notes'>>
 ) {
-  const supabase = await createClient()
-  if (!supabase) return { data: null, error: 'No se pudo conectar con Supabase' }
+  // Trainer puede actualizar SUS sesiones, admin puede actualizar cualquiera (RLS lo filtra)
+  return withGuard('trainer', async () => {
+    const supabase = await createClient()
+    if (!supabase) return { data: null, error: 'No se pudo conectar con Supabase' }
 
-  const { data, error } = await supabase
-    .from('class_sessions')
-    .update(updates)
-    .eq('id', sessionId)
-    .select()
-    .single()
+    const { data, error } = await supabase
+      .from('class_sessions')
+      .update(updates)
+      .eq('id', sessionId)
+      .select()
+      .single()
 
-  if (error) {
-    if (error.message.includes('excl_trainer_time_overlap')) {
-      return {
-        data: null,
-        error: 'El entrenador ya tiene otra sesión en ese horario.',
+    if (error) {
+      if (error.message.includes('excl_trainer_time_overlap')) {
+        return { data: null, error: 'El entrenador ya tiene otra sesión en ese horario.' }
       }
-    }
-    if (error.message.includes('excl_room_time_overlap')) {
-      return {
-        data: null,
-        error: 'La sala ya está ocupada en ese horario.',
+      if (error.message.includes('excl_room_time_overlap')) {
+        return { data: null, error: 'La sala ya está ocupada en ese horario.' }
       }
+      return { data: null, error: error.message }
     }
-    return { data: null, error: error.message }
-  }
 
-  revalidateTag('class-sessions', 'max')
-
-  return { data, error: null }
+    revalidateTag('class-sessions', 'max')
+    return { data, error: null }
+  })
 }
 
 // ─── Cancelar una sesión de clase ───────────────────────────────────────────
@@ -150,38 +147,34 @@ export async function cancelClassSession(sessionId: string) {
 // ─── Inscribir miembro en una sesión ────────────────────────────────────────
 
 export async function enrollInSession(sessionId: string) {
-  const supabase = await createClient()
-  if (!supabase) return { data: null, error: 'No se pudo conectar con Supabase' }
+  // Cualquier miembro puede inscribirse
+  return withGuard('member', async ({ user, gymId }) => {
+    const supabase = await createClient()
+    if (!supabase) return { data: null, error: 'No se pudo conectar con Supabase' }
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { data: null, error: 'No autenticado' }
+    const { data, error } = await supabase
+      .from('session_enrollments')
+      .insert({
+        gym_id: gymId,
+        session_id: sessionId,
+        user_id: user.id,
+      })
+      .select()
+      .single()
 
-  const gymId = user.app_metadata?.gym_id
-  if (!gymId) return { data: null, error: 'No se encontró gym_id' }
-
-  const { data, error } = await supabase
-    .from('session_enrollments')
-    .insert({
-      gym_id: gymId,
-      session_id: sessionId,
-      user_id: user.id,
-    })
-    .select()
-    .single()
-
-  if (error) {
-    if (error.code === '23505') {
-      return { data: null, error: 'Ya estás inscrito en esta sesión.' }
+    if (error) {
+      if (error.code === '23505') {
+        return { data: null, error: 'Ya estás inscrito en esta sesión.' }
+      }
+      if (error.message.includes('sesión cancelada')) {
+        return { data: null, error: 'No se puede inscribir en una sesión cancelada.' }
+      }
+      return { data: null, error: error.message }
     }
-    if (error.message.includes('sesión cancelada')) {
-      return { data: null, error: 'No se puede inscribir en una sesión cancelada.' }
-    }
-    return { data: null, error: error.message }
-  }
 
-  revalidateTag('class-sessions', 'max')
-
-  return { data, error: null }
+    revalidateTag('class-sessions', 'max')
+    return { data, error: null }
+  })
 }
 
 // ─── Cancelar inscripción ───────────────────────────────────────────────────
