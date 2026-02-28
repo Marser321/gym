@@ -268,6 +268,130 @@ export interface MembershipRequest {
   created_at: string
 }
 
+// ─── Class Sessions (v3.1) ───────────────────────────────────────────────────
+
+export type SessionStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
+
+export interface ClassSession {
+  id: string
+  gym_id: string
+  class_id: string
+  trainer_id: string | null
+  room: string | null
+  session_date: string
+  start_at: string
+  end_at: string
+  capacity: number
+  enrolled_count: number
+  status: SessionStatus
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type SessionEnrollmentStatus = 'enrolled' | 'attended' | 'cancelled' | 'no_show' | 'waitlisted'
+
+export interface SessionEnrollment {
+  id: string
+  gym_id: string
+  session_id: string
+  user_id: string
+  status: SessionEnrollmentStatus
+  enrolled_at: string
+  cancelled_at: string | null
+}
+
+// ─── Audit Log (v3.1) ───────────────────────────────────────────────────────
+
+export type AuditTrigger = 'system' | 'admin' | 'cron' | 'webhook'
+
+export interface SubscriptionAuditLog {
+  id: string
+  gym_id: string
+  subscription_id: string | null
+  user_id: string | null
+  old_status: string | null
+  new_status: string | null
+  reason: string
+  metadata: Json
+  triggered_by: AuditTrigger
+  created_at: string
+}
+
+// ─── Materialized Views (v3.1) ──────────────────────────────────────────────
+
+export interface MrrByPlan {
+  plan_name: string | null
+  count: number
+  mrr: number
+}
+
+export interface GymMrr {
+  gym_id: string
+  gym_name: string
+  currency: string
+  mrr: number
+  active_subscriptions: number
+  auto_renew_count: number
+  current_month_revenue: number
+  current_month_payments: number
+  previous_month_revenue: number
+  mom_growth_pct: number
+  estimated_arr: number
+  monthly_churn_count: number
+  churn_rate_pct: number
+  arpu: number
+  mrr_by_plan: MrrByPlan[]
+  refreshed_at: string
+}
+
+export interface PeakHour {
+  hour: number
+  count: number
+}
+
+export interface GymAttendance {
+  gym_id: string
+  gym_name: string
+  checkins_today: number
+  unique_visitors_today: number
+  checkins_this_week: number
+  unique_visitors_week: number
+  checkins_this_month: number
+  unique_visitors_month: number
+  checkins_prev_month: number
+  checkins_mom_growth_pct: number
+  class_attended: number
+  class_no_shows: number
+  class_cancelled: number
+  class_total_enrollments: number
+  class_attendance_rate_pct: number
+  no_show_rate_pct: number
+  utilization_rate_pct: number
+  avg_visits_per_member: number
+  active_members: number
+  total_members: number
+  peak_hours: PeakHour[]
+  refreshed_at: string
+}
+
+export interface GymDashboardStats {
+  gym_id: string
+  gym_name: string
+  saas_plan: string
+  upcoming_sessions: number
+  completed_sessions_month: number
+  pending_payments_count: number
+  pending_payments_amount: number
+  failed_payments_count: number
+  failed_payments_amount: number
+  subs_expiring_7d: number
+  new_members_this_month: number
+  total_trainers: number
+  active_trainers: number
+  refreshed_at: string
+}
+
 // ─── JWT App Metadata ────────────────────────────────────────────────────────
 
 export interface GymAppMetadata {
@@ -275,7 +399,7 @@ export interface GymAppMetadata {
   role?: ProfileRole
 }
 
-// ─── Database Type Map (for Supabase client) ─────────────────────────────────
+// ─── Database Type Map (for Supabase client) ──────────��──────────────────────
 
 export interface Database {
   public: {
@@ -287,6 +411,8 @@ export interface Database {
       subscriptions: { Row: Subscription; Insert: Partial<Subscription> & Pick<Subscription, 'gym_id' | 'user_id' | 'end_date'>; Update: Partial<Subscription> }
       classes: { Row: GymClass; Insert: Partial<GymClass> & Pick<GymClass, 'gym_id' | 'title' | 'start_time' | 'end_time'>; Update: Partial<GymClass> }
       class_enrollments: { Row: ClassEnrollment; Insert: Partial<ClassEnrollment> & Pick<ClassEnrollment, 'gym_id' | 'class_id' | 'user_id'>; Update: Partial<ClassEnrollment> }
+      class_sessions: { Row: ClassSession; Insert: Partial<ClassSession> & Pick<ClassSession, 'gym_id' | 'class_id' | 'start_at' | 'end_at' | 'session_date'>; Update: Partial<ClassSession> }
+      session_enrollments: { Row: SessionEnrollment; Insert: Partial<SessionEnrollment> & Pick<SessionEnrollment, 'gym_id' | 'session_id' | 'user_id'>; Update: Partial<SessionEnrollment> }
       payments: { Row: Payment; Insert: Partial<Payment> & Pick<Payment, 'gym_id' | 'amount'>; Update: Partial<Payment> }
       checkins: { Row: Checkin; Insert: Partial<Checkin> & Pick<Checkin, 'gym_id' | 'user_id'>; Update: Partial<Checkin> }
       routines: { Row: Routine; Insert: Partial<Routine> & Pick<Routine, 'gym_id' | 'name'>; Update: Partial<Routine> }
@@ -296,6 +422,12 @@ export interface Database {
       trainer_assignments: { Row: TrainerAssignment; Insert: Partial<TrainerAssignment> & Pick<TrainerAssignment, 'gym_id' | 'trainer_id' | 'client_id'>; Update: Partial<TrainerAssignment> }
       messages: { Row: Message; Insert: Partial<Message> & Pick<Message, 'gym_id' | 'sender_id' | 'receiver_id' | 'content'>; Update: Partial<Message> }
       membership_requests: { Row: MembershipRequest; Insert: Partial<MembershipRequest> & Pick<MembershipRequest, 'gym_id' | 'full_name' | 'email'>; Update: Partial<MembershipRequest> }
+      subscription_audit_log: { Row: SubscriptionAuditLog; Insert: Partial<SubscriptionAuditLog> & Pick<SubscriptionAuditLog, 'gym_id' | 'reason'>; Update: Partial<SubscriptionAuditLog> }
+    }
+    Views: {
+      mv_gym_mrr: { Row: GymMrr }
+      mv_gym_attendance: { Row: GymAttendance }
+      mv_gym_dashboard_stats: { Row: GymDashboardStats }
     }
   }
 }
