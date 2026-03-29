@@ -8,28 +8,6 @@ export function useGymMatch() {
     const [matches, setMatches] = useState<any[]>([]);
     const supabase = createClient();
 
-    useEffect(() => {
-        checkStatus();
-        fetchMatches();
-
-        // Subscribe to changes in real-time
-        const channel = supabase
-            .channel('gym_match_updates')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'gym_match' },
-                (payload) => {
-                    console.log('Change received!', payload);
-                    fetchMatches();
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, []);
-
     const checkStatus = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
@@ -58,6 +36,28 @@ export function useGymMatch() {
 
         setMatches(data || []);
     };
+
+    useEffect(() => {
+        checkStatus();
+        fetchMatches();
+
+        // Subscribe to changes in real-time
+        const channel = supabase
+            .channel('gym_match_updates')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'gym_match' },
+                (payload) => {
+                    console.log('Change received!', payload);
+                    fetchMatches();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, []);
 
     const toggleLooking = async (exercise: string) => {
         const { data: { user } } = await supabase.auth.getUser();
