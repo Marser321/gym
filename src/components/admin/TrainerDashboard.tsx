@@ -24,19 +24,21 @@ export function TrainerDashboard() {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
 
-                // 1. My Clients count
-                const { count: clientsCount } = await supabase
-                    .from('trainer_assignments')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('trainer_id', user.id)
-                    .eq('status', 'active');
+                const [{ count: clientsCount }, { count: msgCount }] = await Promise.all([
+                    // 1. My Clients count
+                    supabase
+                        .from('trainer_assignments')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('trainer_id', user.id)
+                        .eq('status', 'active'),
 
-                // 2. Unread messages (approx for demo)
-                const { count: msgCount } = await supabase
-                    .from('messages')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('receiver_id', user.id)
-                    .eq('is_read', false);
+                    // 2. Unread messages (approx for demo)
+                    supabase
+                        .from('messages')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('receiver_id', user.id)
+                        .eq('is_read', false)
+                ]);
 
                 setStats({
                     myClients: (clientsCount || 0).toString(),
