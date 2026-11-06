@@ -42,47 +42,53 @@ export default function MemberDetailsPage() {
     const fetchMemberDetails = async () => {
         setIsLoading(true);
         try {
-            // 1. Fetch Profile
-            const { data: profile, error: profileError } = await supabase
-                .from("profiles")
-                .select("*")
-                .eq("id", memberId)
-                .single();
+            const [
+                { data: profile, error: profileError },
+                { data: assignment, error: assignmentError },
+                { data: trainerAssig, error: trainerError }
+            ] = await Promise.all([
+                // 1. Fetch Profile
+                supabase
+                    .from("profiles")
+                    .select("*")
+                    .eq("id", memberId)
+                    .single(),
+
+                // 2. Fetch Active Routine
+                // We look for the most recent assignment that is active
+                supabase
+                    .from("user_routines")
+                    .select(`
+                        *,
+                        routine:routines (*)
+                    `)
+                    .eq("user_id", memberId)
+                    .eq("status", "active")
+                    .order("assigned_at", { ascending: false })
+                    .limit(1)
+                    .single(),
+
+                // 3. Fetch Assigned Trainer
+                supabase
+                    .from("trainer_assignments")
+                    .select(`
+                        *,
+                        trainer:profiles!trainer_id (id, full_name, avatar_url)
+                    `)
+                    .eq("client_id", memberId)
+                    .eq("status", "active")
+                    .limit(1)
+                    .single()
+            ]);
 
             if (profileError) throw profileError;
             setMember(profile);
-
-            // 2. Fetch Active Routine
-            // We look for the most recent assignment that is active
-            const { data: assignment, error: assignmentError } = await supabase
-                .from("user_routines")
-                .select(`
-                    *,
-                    routine:routines (*)
-                `)
-                .eq("user_id", memberId)
-                .eq("status", "active")
-                .order("assigned_at", { ascending: false })
-                .limit(1)
-                .single();
 
             if (!assignmentError && assignment) {
                 setCurrentRoutine(assignment);
             } else {
                 setCurrentRoutine(null);
             }
-
-            // 3. Fetch Assigned Trainer
-            const { data: trainerAssig, error: trainerError } = await supabase
-                .from("trainer_assignments")
-                .select(`
-                    *,
-                    trainer:profiles!trainer_id (id, full_name, avatar_url)
-                `)
-                .eq("client_id", memberId)
-                .eq("status", "active")
-                .limit(1)
-                .single();
 
             if (!trainerError && trainerAssig) {
                 setCurrentTrainer(trainerAssig);
