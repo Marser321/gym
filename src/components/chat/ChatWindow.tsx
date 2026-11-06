@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Send, User, Loader2, CheckCheck } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -27,11 +27,57 @@ export function ChatWindow({ userId, partnerId, partnerName }: ChatWindowProps) 
     const [newMessage, setNewMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [isSending, setIsSending] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+
     const scrollRef = useRef<HTMLDivElement>(null);
+    const preserveScrollRef = useRef(false);
+    const prevScrollHeightRef = useRef(0);
+    const lastMessageIdRef = useRef<string | null>(null);
+
     const supabase = createClient();
+    const PAGE_SIZE = 50;
+
+    const loadMessages = useCallback(async (offset = 0) => {
+        if (offset === 0) setIsLoading(true);
+        else setLoadingMore(true);
+
+        try {
+            const { data, error } = await supabase
+                .from("messages")
+                .select("*")
+                .or(`and(sender_id.eq.${userId},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${userId})`)
+                .order("created_at", { ascending: false })
+                .range(offset, offset + PAGE_SIZE - 1);
+
+            if (error) throw error;
+
+            const fetchedMessages = data || [];
+            const reversedMessages = [...fetchedMessages].reverse();
+
+            if (offset === 0) {
+                setMessages(reversedMessages);
+                // Reset scroll tracking
+                lastMessageIdRef.current = null;
+            } else {
+                if (reversedMessages.length > 0) {
+                    preserveScrollRef.current = true;
+                    prevScrollHeightRef.current = scrollRef.current?.scrollHeight || 0;
+                    setMessages((prev) => [...reversedMessages, ...prev]);
+                }
+            }
+
+            setHasMore(fetchedMessages.length >= PAGE_SIZE);
+        } catch (err) {
+            console.error("Error fetching messages:", err);
+        } finally {
+            setIsLoading(false);
+            setLoadingMore(false);
+        }
+    }, [userId, partnerId, supabase]);
 
     useEffect(() => {
-        fetchMessages();
+        loadMessages(0);
 
         // Subscribe to real-time messages
         const channel = supabase
@@ -58,29 +104,32 @@ export function ChatWindow({ userId, partnerId, partnerName }: ChatWindowProps) 
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [userId, partnerId]);
+    }, [userId, partnerId, loadMessages, supabase]);
 
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        if (!scrollRef.current) return;
+
+        if (preserveScrollRef.current) {
+            const newScrollHeight = scrollRef.current.scrollHeight;
+            const diff = newScrollHeight - prevScrollHeightRef.current;
+            scrollRef.current.scrollTop = diff;
+            preserveScrollRef.current = false;
+        } else {
+            // Auto-scroll to bottom only if new messages added at the end (or initial load)
+            const lastMsg = messages[messages.length - 1];
+            const lastMsgId = lastMsg?.id;
+
+            if (messages.length > 0 && lastMsgId !== lastMessageIdRef.current) {
+                scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+            }
+            lastMessageIdRef.current = lastMsgId || null;
         }
     }, [messages]);
 
-    const fetchMessages = async () => {
-        setIsLoading(true);
-        try {
-            const { data, error } = await supabase
-                .from("messages")
-                .select("*")
-                .or(`and(sender_id.eq.${userId},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${userId})`)
-                .order("created_at", { ascending: true });
-
-            if (error) throw error;
-            setMessages(data || []);
-        } catch (err) {
-            console.error("Error fetching messages:", err);
-        } finally {
-            setIsLoading(false);
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const { scrollTop } = e.currentTarget;
+        if (scrollTop === 0 && hasMore && !loadingMore && !isLoading) {
+            loadMessages(messages.length);
         }
     };
 
@@ -122,8 +171,14 @@ export function ChatWindow({ userId, partnerId, partnerName }: ChatWindowProps) 
             {/* Messages Area */}
             <div
                 ref={scrollRef}
+                onScroll={handleScroll}
                 className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide"
             >
+                {loadingMore && (
+                    <div className="flex justify-center py-2">
+                        <Loader2 className="h-4 w-4 animate-spin text-neon-cyan/50" />
+                    </div>
+                )}
                 {isLoading ? (
                     <div className="flex items-center justify-center h-full">
                         <Loader2 className="h-6 w-6 animate-spin text-neon-cyan" />
